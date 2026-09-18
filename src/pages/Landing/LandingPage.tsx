@@ -1,8 +1,15 @@
+import Hero from '../../components/landing/Hero'
+import Navbar from '../../components/landing/Navbar'
+
 function LandingPage() {
   return (
     <main>
-      <h1>SOLVRA</h1>
-      <p>AI-Powered Solar Bidding & Decision Platform</p>
+      <div className="relative">
+        <Navbar />
+        <Hero />
+      </div>
+
+      {/* Sections will be added here next */}
     </main>
   )
 }
