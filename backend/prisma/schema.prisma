@@ -1,0 +1,518 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum UserRole {
+  BUYER
+  SUPPLIER
+  ADMIN
+}
+
+enum BuyerType {
+  INDIVIDUAL
+  BUSINESS
+  INSTITUTION
+}
+
+enum PropertyType {
+  RESIDENTIAL
+  COMMERCIAL
+  INSTITUTIONAL
+}
+
+enum RequestStatus {
+  DRAFT
+  OPEN
+  EVALUATING
+  NEGOTIATING
+  AWARDED
+  CLOSED
+}
+
+enum EvaluationCriterionType {
+  PRICE
+  TECHNICAL_COMPLIANCE
+  WARRANTY
+  DELIVERY
+  MAINTENANCE
+  PAYMENT_TERMS
+  CUSTOM
+}
+
+enum BidStatus {
+  SUBMITTED
+  UNDER_NEGOTIATION
+  REVISED
+  NON_COMPLIANT
+  AWARDED
+  REJECTED
+  WITHDRAWN
+}
+
+enum ExtractionSource {
+  MANUAL_ENTRY
+  AI_EXTRACTED
+}
+
+enum BidDocumentType {
+  PDF
+  XLSX
+}
+
+enum NegotiationStatus {
+  OPEN
+  RESOLVED
+  CLOSED
+}
+
+enum NegotiationAuthorType {
+  BUYER
+  SUPPLIER
+  AI_SUGGESTION
+}
+
+enum ActivityAction {
+  REQUEST_CREATED
+  BID_SUBMITTED
+  BID_REVISED
+  WEIGHTS_SET
+  EVALUATION_RUN
+  NEGOTIATION_MESSAGE_SENT
+  WHAT_IF_RUN
+  AWARD_MADE
+  REQUEST_UPDATED
+  REQUEST_STATUS_CHANGED
+  BID_WITHDRAWN
+  BID_REJECTED
+  SUPPLIER_VERIFIED
+  USER_DEACTIVATED
+}
+enum Currency {
+  USD
+  LBP
+}
+
+enum RoofType {
+  FLAT
+  SLOPED
+  GROUND
+  UNKNOWN
+}
+
+enum PropertyOwnership {
+  OWNED
+  RENTED
+  OTHER
+}
+
+enum RequestPriority {
+  LOWEST_PRICE
+  BALANCED
+  QUALITY
+  RELIABILITY
+}
+
+enum TargetTimeline {
+  ASAP
+  ONE_TO_THREE_MONTHS
+  THREE_TO_SIX_MONTHS
+  SIX_TO_TWELVE_MONTHS
+  FLEXIBLE
+}
+// ============================================================
+// USER
+// ============================================================
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  role         UserRole
+  isActive     Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  buyerProfile    BuyerProfile?
+  supplierProfile SupplierProfile?
+
+  negotiationMessages NegotiationMessage[]
+  whatIfScenarios     WhatIfScenario[]
+  awards              Award[]
+  activityLogs        ActivityLog[]
+  passwordResetTokens PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id     String @id @default(uuid())
+  userId String
+
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// ============================================================
+// BUYER PROFILE
+// ============================================================
+
+model BuyerProfile {
+  id          String    @id @default(uuid())
+  userId      String    @unique
+  buyerType   BuyerType
+  displayName String
+  location    String
+  phone       String?
+
+  user     User           @relation(fields: [userId], references: [id])
+  requests SolarRequest[]
+}
+
+// ============================================================
+// SUPPLIER PROFILE
+// ============================================================
+
+model SupplierProfile {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  companyName     String
+  serviceAreas    String[]
+  capabilities    String[]
+  certifications  String?
+  verifiedByAdmin Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id])
+
+  bids Bid[]
+}
+
+// ============================================================
+// SOLAR REQUEST
+// ============================================================
+
+model SolarRequest {
+  id             String        @id @default(uuid())
+  buyerId        String
+
+  title          String
+  propertyType   PropertyType
+  location       String
+
+  status         RequestStatus @default(DRAFT)
+
+  budget         Decimal?      @db.Decimal(14, 2)
+  currency       Currency?
+
+  rawDescription String
+
+  monthlyElectricityBill   Decimal? @db.Decimal(14, 2)
+  averageMonthlyConsumption Decimal? @db.Decimal(14, 2)
+
+  roofType   RoofType?
+  ownership  PropertyOwnership?
+  priority   RequestPriority?
+  timeline   TargetTimeline?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  buyer BuyerProfile @relation(fields: [buyerId], references: [id])
+
+  requirementProfile RequirementProfile?
+  evaluationCriteria EvaluationCriterion[]
+  bids               Bid[]
+  evaluationResults  EvaluationResult[]
+  whatIfScenarios    WhatIfScenario[]
+  award              Award?
+
+  activityLogs ActivityLog[]
+
+  @@index([buyerId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ============================================================
+// REQUIREMENT PROFILE
+// ============================================================
+
+model RequirementProfile {
+  id        String @id @default(uuid())
+  requestId String @unique
+
+  occupantsOrUsers Int?
+  acUnitsCount     Int?
+
+  applianceLoad Json?
+  usagePattern  Json?
+
+  backupRequired Boolean @default(false)
+
+  currentElectricitySituation String?
+  goals                       String[]
+  preferences                 String?
+
+  extractionConfidence Decimal? @db.Decimal(5, 4)
+
+  confirmedByBuyer Boolean @default(false)
+
+  request SolarRequest @relation(fields: [requestId], references: [id])
+}
+
+// ============================================================
+// EVALUATION CRITERION
+// ============================================================
+
+model EvaluationCriterion {
+  id        String @id @default(uuid())
+  requestId String
+
+  name EvaluationCriterionType
+
+  weightPercent Decimal @db.Decimal(5, 2)
+
+  request SolarRequest @relation(fields: [requestId], references: [id])
+
+  @@index([requestId])
+}
+
+// ============================================================
+// BID
+// ============================================================
+
+model Bid {
+  id         String @id @default(uuid())
+  requestId  String
+  supplierId String
+
+  status BidStatus @default(SUBMITTED)
+
+  createdAt DateTime @default(now())
+
+  request  SolarRequest    @relation(fields: [requestId], references: [id])
+  supplier SupplierProfile @relation(fields: [supplierId], references: [id])
+
+  versions     BidVersion[]
+  negotiations Negotiation[]
+  activityLogs ActivityLog[]
+
+  @@unique([requestId, supplierId])
+  @@index([requestId])
+  @@index([supplierId])
+}
+
+// ============================================================
+// BID VERSION
+// ============================================================
+
+model BidVersion {
+  id            String @id @default(uuid())
+  bidId         String
+  versionNumber Int
+
+  panelCapacityKw    Decimal  @db.Decimal(12, 3)
+  batteryCapacityKwh Decimal? @db.Decimal(12, 3)
+  batteryType        String?
+  inverterSpec       String?
+
+  equipmentDetails Json?
+
+  installationCost  Decimal  @db.Decimal(14, 2)
+  deliveryCost      Decimal  @db.Decimal(14, 2)
+  commissioningCost Decimal  @db.Decimal(14, 2)
+  maintenanceCost   Decimal? @db.Decimal(14, 2)
+
+  warrantyYears    Int?
+  deliveryTimeDays Int?
+  paymentTerms     String?
+
+  totalPrice Decimal @db.Decimal(14, 2)
+
+  extractionSource    ExtractionSource
+  extractionConfirmed Boolean          @default(false)
+
+  changeSummary String?
+
+  createdAt DateTime @default(now())
+
+  bid Bid @relation(fields: [bidId], references: [id])
+
+  documents         BidDocument[]
+  evaluationResults EvaluationResult[]
+  whatIfScenarios   WhatIfScenario[]
+  award             Award?
+
+  @@unique([bidId, versionNumber])
+  @@index([bidId])
+}
+
+// ============================================================
+// BID DOCUMENT
+// ============================================================
+
+model BidDocument {
+  id           String @id @default(uuid())
+  bidVersionId String
+
+  fileUrl  String
+  fileType BidDocumentType
+
+  uploadedAt DateTime @default(now())
+
+  bidVersion BidVersion @relation(fields: [bidVersionId], references: [id])
+
+  @@index([bidVersionId])
+}
+
+// ============================================================
+// EVALUATION RESULT
+// ============================================================
+
+model EvaluationResult {
+  id           String @id @default(uuid())
+  bidVersionId String
+  requestId    String
+
+  tcoAmount          Decimal @db.Decimal(14, 2)
+  criterionScores    Json?
+  weightedTotalScore Decimal @db.Decimal(8, 4)
+
+  rank Int
+
+  isCompliant Boolean
+
+  computedAt DateTime @default(now())
+
+  bidVersion BidVersion   @relation(fields: [bidVersionId], references: [id])
+  request    SolarRequest @relation(fields: [requestId], references: [id])
+
+  @@index([requestId])
+  @@index([bidVersionId])
+}
+
+// ============================================================
+// NEGOTIATION
+// ============================================================
+
+model Negotiation {
+  id    String @id @default(uuid())
+  bidId String
+
+  status NegotiationStatus @default(OPEN)
+
+  createdAt DateTime @default(now())
+
+  bid      Bid                  @relation(fields: [bidId], references: [id])
+  messages NegotiationMessage[]
+
+  @@index([bidId])
+}
+
+// ============================================================
+// NEGOTIATION MESSAGE
+// ============================================================
+
+model NegotiationMessage {
+  id            String @id @default(uuid())
+  negotiationId String
+
+  senderId   String?
+  authorType NegotiationAuthorType
+
+  content String
+
+  createdAt DateTime @default(now())
+
+  negotiation Negotiation @relation(fields: [negotiationId], references: [id])
+  sender      User?       @relation(fields: [senderId], references: [id])
+
+  @@index([negotiationId])
+  @@index([senderId])
+}
+
+// ============================================================
+// WHAT-IF SCENARIO
+// ============================================================
+
+model WhatIfScenario {
+  id           String @id @default(uuid())
+  requestId    String
+  bidVersionId String
+  runByUserId  String
+
+  parameters         Json
+  hypotheticalResult Json
+
+  createdAt DateTime @default(now())
+
+  request    SolarRequest @relation(fields: [requestId], references: [id])
+  bidVersion BidVersion   @relation(fields: [bidVersionId], references: [id])
+  runByUser  User         @relation(fields: [runByUserId], references: [id])
+
+  @@index([requestId])
+  @@index([bidVersionId])
+  @@index([runByUserId])
+}
+
+// ============================================================
+// AWARD
+// ============================================================
+
+model Award {
+  id              String @id @default(uuid())
+  requestId       String @unique
+  bidVersionId    String
+  awardedByUserId String
+
+  awardedAt DateTime @default(now())
+
+  request    SolarRequest @relation(fields: [requestId], references: [id])
+  bidVersion BidVersion   @relation(fields: [bidVersionId], references: [id])
+  awardedBy  User         @relation(fields: [awardedByUserId], references: [id])
+
+  @@unique([bidVersionId])
+  @@index([awardedByUserId])
+}
+
+// ============================================================
+// ACTIVITY LOG
+// ============================================================
+
+model ActivityLog {
+  id String @id @default(uuid())
+
+  actorId   String?
+  requestId String?
+  bidId     String?
+
+  action ActivityAction
+
+  metadata Json?
+
+  createdAt DateTime @default(now())
+
+  actor   User?         @relation(fields: [actorId], references: [id])
+  request SolarRequest? @relation(fields: [requestId], references: [id])
+  bid     Bid?          @relation(fields: [bidId], references: [id])
+
+  @@index([actorId])
+  @@index([requestId])
+  @@index([bidId])
+  @@index([createdAt])
+}
