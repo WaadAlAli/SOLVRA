@@ -101,3 +101,40 @@ export const loginSchema = z.object({
 })
 
 export type LoginInput = z.infer<typeof loginSchema>
+
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .email('Please enter a valid email address'),
+})
+
+export type ForgotPasswordInput = z.infer<
+  typeof forgotPasswordSchema
+>
+
+export const resetPasswordSchema = z.object({
+  token: z
+    .string()
+    .trim()
+    .min(1, 'Reset token is required'),
+
+  password: passwordSchema,
+
+  confirmPassword: z
+    .string()
+    .min(1, 'Please confirm your password'),
+}).superRefine((data, ctx) => {
+  if (data.password !== data.confirmPassword) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['confirmPassword'],
+      message: 'Passwords do not match',
+    })
+  }
+})
+
+export type ResetPasswordInput = z.infer<
+  typeof resetPasswordSchema
+>

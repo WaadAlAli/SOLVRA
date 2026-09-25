@@ -5,6 +5,8 @@ export interface AuthUser {
   email: string
   role: UserRole
   isActive: boolean
+  displayName?: string | null
+  companyName?: string | null
 }
 
 export interface AuthResponse {

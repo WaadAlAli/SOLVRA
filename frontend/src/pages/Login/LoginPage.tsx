@@ -55,7 +55,12 @@ function LoginPage() {
       })
 
       if (response.success) {
-        navigate('/dashboard')
+        const destination =
+          response.user?.role === 'SUPPLIER'
+            ? '/supplier'
+            : '/dashboard'
+
+        navigate(destination, { replace: true })
       }
     } catch (error) {
       setError(

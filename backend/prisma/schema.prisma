@@ -96,7 +96,38 @@ enum ActivityAction {
   SUPPLIER_VERIFIED
   USER_DEACTIVATED
 }
+enum Currency {
+  USD
+  LBP
+}
 
+enum RoofType {
+  FLAT
+  SLOPED
+  GROUND
+  UNKNOWN
+}
+
+enum PropertyOwnership {
+  OWNED
+  RENTED
+  OTHER
+}
+
+enum RequestPriority {
+  LOWEST_PRICE
+  BALANCED
+  QUALITY
+  RELIABILITY
+}
+
+enum TargetTimeline {
+  ASAP
+  ONE_TO_THREE_MONTHS
+  THREE_TO_SIX_MONTHS
+  SIX_TO_TWELVE_MONTHS
+  FLEXIBLE
+}
 // ============================================================
 // USER
 // ============================================================
@@ -118,6 +149,23 @@ model User {
   whatIfScenarios     WhatIfScenario[]
   awards              Award[]
   activityLogs        ActivityLog[]
+  passwordResetTokens PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id     String @id @default(uuid())
+  userId String
+
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 // ============================================================
@@ -161,11 +209,25 @@ model SupplierProfile {
 model SolarRequest {
   id             String        @id @default(uuid())
   buyerId        String
+
+  title          String
   propertyType   PropertyType
   location       String
+
   status         RequestStatus @default(DRAFT)
+
   budget         Decimal?      @db.Decimal(14, 2)
+  currency       Currency?
+
   rawDescription String
+
+  monthlyElectricityBill   Decimal? @db.Decimal(14, 2)
+  averageMonthlyConsumption Decimal? @db.Decimal(14, 2)
+
+  roofType   RoofType?
+  ownership  PropertyOwnership?
+  priority   RequestPriority?
+  timeline   TargetTimeline?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -180,6 +242,10 @@ model SolarRequest {
   award              Award?
 
   activityLogs ActivityLog[]
+
+  @@index([buyerId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 // ============================================================

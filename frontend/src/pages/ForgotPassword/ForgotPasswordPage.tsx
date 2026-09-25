@@ -8,26 +8,35 @@ import {
 import { Link } from 'react-router-dom'
 
 import AuthShell from '../../components/auth/AuthShell'
+import { forgotPassword } from '../../services/auth.service'
 
 function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (
     event: React.FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault()
 
+    setError('')
     setLoading(true)
 
-    // Backend reset-email endpoint will be connected here.
-    await new Promise((resolve) =>
-      setTimeout(resolve, 700),
-    )
+    try {
+      await forgotPassword(email.trim())
 
-    setSubmitted(true)
-    setLoading(false)
+      setSubmitted(true)
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'Unable to process your request.',
+      )
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -63,6 +72,11 @@ function ForgotPasswordPage() {
             password.
           </p>
 
+          <p className="mt-4 text-xs leading-5 text-[var(--text-muted)]">
+            The reset link is valid for 30 minutes and can
+            only be used once.
+          </p>
+
           <Link
             to="/login"
             className="mt-6 flex h-11 items-center justify-center rounded-xl bg-[var(--copper)] text-sm font-semibold text-white transition hover:bg-[var(--copper-hover)]"
@@ -94,15 +108,22 @@ function ForgotPasswordPage() {
                 type="email"
                 autoComplete="email"
                 value={email}
-                onChange={(event) =>
+                onChange={(event) => {
                   setEmail(event.target.value)
-                }
+                  setError('')
+                }}
                 placeholder="you@company.com"
                 required
                 className="h-12 w-full rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] pl-11 pr-4 text-sm outline-none transition placeholder:text-[var(--text-muted)] focus:border-[var(--copper)] focus:ring-2 focus:ring-[var(--copper)]/10"
               />
             </div>
           </div>
+
+          {error && (
+            <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-600 dark:text-red-400">
+              {error}
+            </div>
+          )}
 
           <button
             type="submit"

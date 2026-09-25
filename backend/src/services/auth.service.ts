@@ -51,6 +51,14 @@ export async function registerUser(input: RegisterInput) {
     return createdUser
   })
 
+  const userWithProfiles = await prisma.user.findUnique({
+    where: { id: user.id },
+    include: {
+      buyerProfile: true,
+      supplierProfile: true,
+    },
+  })
+
   const accessToken = generateAccessToken({
     userId: user.id,
     role: user.role,
@@ -63,6 +71,13 @@ export async function registerUser(input: RegisterInput) {
       email: user.email,
       role: user.role,
       isActive: user.isActive,
+      displayName:
+        userWithProfiles?.buyerProfile?.displayName ??
+        userWithProfiles?.supplierProfile?.companyName ??
+        null,
+      companyName:
+        userWithProfiles?.supplierProfile?.companyName ??
+        null,
     },
   }
 }
@@ -70,6 +85,10 @@ export async function loginUser(input: LoginInput) {
   const user = await prisma.user.findUnique({
     where: {
       email: input.email,
+    },
+    include: {
+      buyerProfile: true,
+      supplierProfile: true,
     },
   })
 
@@ -102,6 +121,13 @@ export async function loginUser(input: LoginInput) {
       email: user.email,
       role: user.role,
       isActive: user.isActive,
+      displayName:
+        user.buyerProfile?.displayName ??
+        user.supplierProfile?.companyName ??
+        null,
+      companyName:
+        user.supplierProfile?.companyName ??
+        null,
     },
   }
 }

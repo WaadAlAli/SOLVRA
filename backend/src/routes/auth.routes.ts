@@ -1,10 +1,12 @@
 import { Router } from 'express'
 
 import {
+  forgotPassword,
   login,
   logout,
   me,
   register,
+  resetPasswordHandler,
 } from '../controllers/auth.controller.js'
 
 import { authenticate } from '../middleware/auth.middleware.js'
@@ -19,6 +21,9 @@ router.post('/login',authRateLimiter, login)
 router.get('/me', authenticate, me)
 
 router.post('/logout', logout)
+router.post( '/forgot-password', authRateLimiter, forgotPassword,)
+
+router.post( '/reset-password',authRateLimiter,resetPasswordHandler,)
 
 router.get(
   '/buyer-test',

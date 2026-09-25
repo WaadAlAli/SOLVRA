@@ -8,8 +8,16 @@ import {
 import {
   loginSchema,
   registerSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
 } from '../validators/auth.validator.js'
 import type { AuthenticatedRequest } from '../middleware/auth.middleware.js'
+import {
+  requestPasswordReset,
+  resetPassword,
+} from '../services/password-reset.service.js'
+
+import { sendPasswordResetEmail } from '../services/email.service.js'
 
 const isProduction = process.env.NODE_ENV === 'production'
 
@@ -154,6 +162,16 @@ export async function me(
       role: true,
       isActive: true,
       createdAt: true,
+      buyerProfile: {
+        select: {
+          displayName: true,
+        },
+      },
+      supplierProfile: {
+        select: {
+          companyName: true,
+        },
+      },
     },
   })
 
@@ -167,7 +185,14 @@ export async function me(
 
   res.status(200).json({
     success: true,
-    user,
+    user: {
+      ...user,
+      displayName:
+        user.buyerProfile?.displayName ??
+        user.supplierProfile?.companyName ??
+        null,
+      companyName: user.supplierProfile?.companyName ?? null,
+    },
   })
 }
 
@@ -186,4 +211,102 @@ export function logout(
     success: true,
     message: 'Logged out successfully.',
   })
+}
+export async function forgotPassword(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  
+  const validation =
+    forgotPasswordSchema.safeParse(req.body)
+
+  if (!validation.success) {
+    res.status(400).json({
+      success: false,
+      message: 'Please enter a valid email address.',
+    })
+    return
+  }
+
+  try {
+    const result = await requestPasswordReset(
+      validation.data,
+    )
+
+    if (result.resetToken) {
+      await sendPasswordResetEmail(
+        validation.data.email,
+        result.resetToken,
+      )
+    }
+
+    // Deliberately identical whether the email exists or not.
+    res.status(200).json({
+      success: true,
+      message:
+        'If an account exists for that email, a password reset link has been sent.',
+    })
+  } catch (error) {
+    console.error(
+      'Forgot password error:',
+      error,
+    )
+
+    res.status(500).json({
+      success: false,
+      message:
+        'Unable to process your request right now.',
+    })
+  }
+}
+
+export async function resetPasswordHandler(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const validation =
+    resetPasswordSchema.safeParse(req.body)
+
+  if (!validation.success) {
+    res.status(400).json({
+      success: false,
+      message: 'Please check your password information.',
+      errors:
+        validation.error.flatten().fieldErrors,
+    })
+    return
+  }
+
+  try {
+    await resetPassword(validation.data)
+
+    res.status(200).json({
+      success: true,
+      message:
+        'Password reset successfully. You can now sign in.',
+    })
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === 'INVALID_RESET_TOKEN'
+    ) {
+      res.status(400).json({
+        success: false,
+        message:
+          'This password reset link is invalid or has expired.',
+      })
+      return
+    }
+
+    console.error(
+      'Reset password error:',
+      error,
+    )
+
+    res.status(500).json({
+      success: false,
+      message:
+        'Unable to reset your password right now.',
+    })
+  }
 }

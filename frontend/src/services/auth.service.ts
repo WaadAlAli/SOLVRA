@@ -40,3 +40,30 @@ export async function logout(): Promise<AuthResponse> {
 
   return response.data
 }
+export async function forgotPassword(
+  email: string,
+): Promise<AuthResponse> {
+  const response = await api.post<AuthResponse>(
+    '/auth/forgot-password',
+    { email },
+  )
+
+  return response.data
+}
+
+export async function resetPassword(
+  token: string,
+  password: string,
+  confirmPassword: string,
+): Promise<AuthResponse> {
+  const response = await api.post<AuthResponse>(
+    '/auth/reset-password',
+    {
+      token,
+      password,
+      confirmPassword,
+    },
+  )
+
+  return response.data
+}
