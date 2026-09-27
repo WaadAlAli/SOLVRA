@@ -304,7 +304,7 @@ model Bid {
   supplierId String
 
   title      String?
-  status BidStatus @default(SUBMITTED)
+  status     BidStatus @default(SUBMITTED)
 
   createdAt DateTime @default(now())
 

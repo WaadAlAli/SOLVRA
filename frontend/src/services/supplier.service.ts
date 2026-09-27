@@ -189,3 +189,15 @@ export async function getSupplierBidById(
   const response = await api.get<{ success: boolean; bid: SupplierBid }>(`/supplier/bids/${bidId}`)
   return response.data
 }
+
+export async function submitSupplierBidVersion(
+  bidId: string,
+  payload: Omit<SupplierBidPayload, 'title'>,
+): Promise<{ success: boolean; message?: string; bid: SupplierBid }> {
+  const response = await api.post<{ success: boolean; message?: string; bid: SupplierBid }>(
+    `/supplier/bids/${bidId}/versions`,
+    payload,
+  )
+
+  return response.data
+}

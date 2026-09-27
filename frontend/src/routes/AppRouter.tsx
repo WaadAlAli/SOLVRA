@@ -116,6 +116,7 @@ function AppRouter() {
         <Route path="/supplier/requests" element={<SupplierRoute><SupplierRequestsPage /></SupplierRoute>} />
         <Route path="/supplier/requests/:requestId" element={<SupplierRoute><SupplierRequestDetailPage /></SupplierRoute>} />
         <Route path="/supplier/requests/:requestId/bid" element={<SupplierRoute><SupplierBidFormPage /></SupplierRoute>} />
+        <Route path="/supplier/bids/:bidId/version" element={<SupplierRoute><SupplierBidFormPage/></SupplierRoute>}/>
         <Route path="/supplier/bids" element={<SupplierRoute><SupplierBidsPage /></SupplierRoute>} />
         <Route path="/supplier/bids/:bidId" element={<SupplierRoute><SupplierBidDetailPage /></SupplierRoute>} />
         <Route path="/supplier/negotiations" element={<SupplierRoute><NegotiationsPage /></SupplierRoute>}/>

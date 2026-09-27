@@ -71,7 +71,8 @@ function SupplierBidsPage() {
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-[var(--copper)]">{bid.status}</p>
-                      <h3 className="mt-2 text-xl font-semibold tracking-[-0.02em]">{bid.request.title}</h3>
+                      <h3 className="mt-2 text-xl font-semibold tracking-[-0.02em]">{bid.title || 'Proposal'}</h3>
+                      <p className="mt-1 text-xs text-[var(--text-muted)]">{bid.request.title} · Version {bid.latestVersion?.versionNumber ?? 1}</p>
                     </div>
                     <span className="rounded-full border border-[var(--border)] bg-[var(--bg-primary)] px-2.5 py-1 text-[10px] uppercase tracking-[0.12em] text-[var(--text-muted)]">
                       {bid.latestVersion?.totalPrice ?? '—'}
@@ -90,10 +91,16 @@ function SupplierBidsPage() {
                     <p className="text-xs text-[var(--text-muted)]">Submitted {formatDate(bid.createdAt)}</p>
                   </div>
 
-                  <div className="mt-4 border-t border-[var(--border)] pt-4">
+                  <div className="mt-4 flex flex-wrap gap-2 border-t border-[var(--border)] pt-4">
                     <Link to={`/supplier/bids/${bid.id}`} className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] px-3 py-2 text-xs font-semibold transition hover:bg-[var(--text-primary)]/[0.04]">
                       View bid details
                     </Link>
+                    {bid.request.status === 'OPEN' && (
+  <Link to={`/supplier/requests/${bid.request.id}/bid`}
+    className="inline-flex items-center justify-center rounded-xl border border-[var(--border)] px-4 py-2.5 text-xs font-semibold transition hover:bg-[var(--text-primary)]/[0.04]">
+    Submit another proposal
+  </Link>
+)}
                   </div>
                 </article>
               ))

@@ -2,6 +2,7 @@ import { Router } from 'express'
 
 import {
   createSupplierBid,
+  createSupplierBidVersion,
   getMyBidById,
   getMyBids,
   getOpenRequestById,
@@ -24,6 +25,7 @@ router.patch('/profile', updateSupplierProfile)
 router.get('/requests', getOpenRequests)
 router.get('/requests/:id', getOpenRequestById)
 router.post('/requests/:requestId/bid', createSupplierBid)
+router.post('/bids/:id/versions', createSupplierBidVersion)
 router.get('/bids', getMyBids)
 router.get('/bids/:id', getMyBidById)
 

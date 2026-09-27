@@ -33,6 +33,25 @@ const createBidSchema = z.object({
   changeSummary: z.string().trim().max(1000).optional().nullable(),
 })
 
+const createBidVersionSchema = z.object({
+  panelCapacityKw: z.coerce.number().positive('Panel capacity must be greater than zero'),
+  batteryCapacityKwh: z.coerce.number().nonnegative().optional().nullable(),
+  batteryType: z.string().trim().max(200).optional().nullable(),
+  inverterSpec: z.string().trim().max(200).optional().nullable(),
+  equipmentDetails: z.any().optional().nullable(),
+  installationCost: z.coerce.number().nonnegative('Installation cost must be zero or greater'),
+  deliveryCost: z.coerce.number().nonnegative('Delivery cost must be zero or greater'),
+  commissioningCost: z.coerce.number().nonnegative('Commissioning cost must be zero or greater'),
+  maintenanceCost: z.coerce.number().nonnegative().optional().nullable(),
+  warrantyYears: z.coerce.number().int().min(0).optional().nullable(),
+  deliveryTimeDays: z.coerce.number().int().min(0).optional().nullable(),
+  paymentTerms: z.string().trim().max(500).optional().nullable(),
+  totalPrice: z.coerce.number().nonnegative('Total price must be zero or greater'),
+  extractionSource: z.enum(['MANUAL_ENTRY', 'AI_EXTRACTED']).default('MANUAL_ENTRY'),
+  extractionConfirmed: z.boolean().default(true),
+  changeSummary: z.string().trim().max(1000).optional().nullable(),
+})
+
 async function getSupplierProfileByUserId(userId: string) {
   return prisma.supplierProfile.findUnique({
     where: { userId },
@@ -526,6 +545,189 @@ export async function createSupplierBid(
     return res.status(500).json({
       success: false,
       message: 'Failed to submit bid',
+    })
+  }
+}
+
+export async function createSupplierBidVersion(
+  req: AuthenticatedRequest,
+  res: Response,
+) {
+  try {
+    const userId = req.user?.userId
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required',
+      })
+    }
+
+    const paramResult = bidIdParamSchema.safeParse({
+      bidId: Array.isArray(req.params.id)
+        ? req.params.id[0]
+        : req.params.id,
+    })
+
+    if (!paramResult.success) {
+      return res.status(400).json({
+        success: false,
+        message: 'Bid ID is invalid',
+        errors: paramResult.error.flatten(),
+      })
+    }
+
+    const validation = createBidVersionSchema.safeParse(req.body)
+
+    if (!validation.success) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid bid version data',
+        errors: validation.error.flatten(),
+      })
+    }
+
+    const supplierProfile = await getSupplierProfileByUserId(userId)
+
+    if (!supplierProfile) {
+      return res.status(403).json({
+        success: false,
+        message: 'Supplier profile not found',
+      })
+    }
+
+    const bid = await prisma.bid.findFirst({
+      where: {
+        id: paramResult.data.bidId,
+        supplierId: supplierProfile.id,
+      },
+      include: {
+        request: {
+          select: {
+            id: true,
+            status: true,
+          },
+        },
+        versions: {
+          orderBy: {
+            versionNumber: 'desc',
+          },
+          take: 1,
+        },
+      },
+    })
+
+    if (!bid) {
+      return res.status(404).json({
+        success: false,
+        message: 'Bid not found',
+      })
+    }
+
+    if (
+      bid.status === 'AWARDED' ||
+      bid.status === 'REJECTED' ||
+      bid.status === 'WITHDRAWN'
+    ) {
+      return res.status(409).json({
+        success: false,
+        message: 'This bid can no longer be revised',
+      })
+    }
+
+    if (
+      bid.request.status === 'AWARDED' ||
+      bid.request.status === 'CLOSED'
+    ) {
+      return res.status(409).json({
+        success: false,
+        message: 'This request is no longer accepting bid revisions',
+      })
+    }
+
+    const latestVersionNumber = bid.versions[0]?.versionNumber ?? 0
+    const nextVersionNumber = latestVersionNumber + 1
+
+    const version = await prisma.bidVersion.create({
+      data: {
+        bidId: bid.id,
+        versionNumber: nextVersionNumber,
+
+        panelCapacityKw: validation.data.panelCapacityKw,
+        batteryCapacityKwh: validation.data.batteryCapacityKwh ?? null,
+        batteryType: validation.data.batteryType ?? null,
+        inverterSpec: validation.data.inverterSpec ?? null,
+
+        equipmentDetails:
+          validation.data.equipmentDetails === undefined
+            ? undefined
+            : validation.data.equipmentDetails === null
+              ? Prisma.JsonNull
+              : (validation.data.equipmentDetails as Prisma.InputJsonValue),
+
+        installationCost: validation.data.installationCost,
+        deliveryCost: validation.data.deliveryCost,
+        commissioningCost: validation.data.commissioningCost,
+        maintenanceCost: validation.data.maintenanceCost ?? null,
+        warrantyYears: validation.data.warrantyYears ?? null,
+        deliveryTimeDays: validation.data.deliveryTimeDays ?? null,
+        paymentTerms: validation.data.paymentTerms ?? null,
+        totalPrice: validation.data.totalPrice,
+
+        extractionSource: validation.data.extractionSource,
+        extractionConfirmed: validation.data.extractionConfirmed,
+        changeSummary: validation.data.changeSummary ?? null,
+      },
+    })
+
+    await prisma.bid.update({
+      where: { id: bid.id },
+      data: {
+        status: 'REVISED',
+      },
+    })
+
+    const freshBid = await prisma.bid.findUnique({
+      where: { id: bid.id },
+      include: {
+        request: {
+          select: {
+            id: true,
+            title: true,
+            location: true,
+            status: true,
+            propertyType: true,
+            budget: true,
+            createdAt: true,
+          },
+        },
+        versions: {
+          orderBy: {
+            versionNumber: 'desc',
+          },
+          include: {
+            documents: true,
+          },
+        },
+      },
+    })
+
+    return res.status(201).json({
+      success: true,
+      message: `Bid version ${version.versionNumber} submitted successfully`,
+      bid: freshBid
+        ? {
+            ...freshBid,
+            latestVersion: freshBid.versions[0] ?? null,
+          }
+        : null,
+    })
+  } catch (error) {
+    console.error('Create supplier bid version error:', error)
+
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to submit bid revision',
     })
   }
 }

@@ -139,18 +139,27 @@ export async function createNegotiation(
       })
     }
 
-    const negotiation = await prisma.negotiation.create({
-      data: {
-        bidId: bid.id,
-        status: 'OPEN',
-      },
-      select: {
-        id: true,
-        bidId: true,
-        status: true,
-        createdAt: true,
-      },
-    })
+    const [negotiation] = await prisma.$transaction([
+  prisma.negotiation.create({
+    data: {
+      bidId: bid.id,
+      status: 'OPEN',
+    },
+    select: {
+      id: true,
+      bidId: true,
+      status: true,
+      createdAt: true,
+    },
+  }),
+
+  prisma.bid.update({
+    where: { id: bid.id },
+    data: {
+      status: 'UNDER_NEGOTIATION',
+    },
+  }),
+])
 
     return res.status(201).json({
       success: true,
