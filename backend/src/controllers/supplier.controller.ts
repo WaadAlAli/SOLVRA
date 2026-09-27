@@ -14,6 +14,7 @@ const bidIdParamSchema = z.object({
 })
 
 const createBidSchema = z.object({
+  title: z.string().trim().min(2).max(200),
   panelCapacityKw: z.coerce.number().positive('Panel capacity must be greater than zero'),
   batteryCapacityKwh: z.coerce.number().nonnegative().optional().nullable(),
   batteryType: z.string().trim().max(200).optional().nullable(),
@@ -437,26 +438,11 @@ export async function createSupplierBid(
       })
     }
 
-    const existingBid = await prisma.bid.findUnique({
-      where: {
-        requestId_supplierId: {
-          requestId: request.id,
-          supplierId: supplierProfile.id,
-        },
-      },
-    })
-
-    if (existingBid) {
-      return res.status(409).json({
-        success: false,
-        message: 'You have already submitted a bid for this request',
-      })
-    }
-
     const bid = await prisma.bid.create({
       data: {
         requestId: request.id,
         supplierId: supplierProfile.id,
+        title: validation.data.title,
         status: 'SUBMITTED',
         versions: {
           create: {

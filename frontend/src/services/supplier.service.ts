@@ -55,6 +55,7 @@ export interface SupplierBid {
   id: string
   requestId: string
   supplierId: string
+  title: string | null
   status: string
   createdAt: string
   request: {
@@ -117,6 +118,7 @@ export interface UpdateSupplierProfileInput {
 }
 
 export interface SupplierBidPayload {
+  title: string
   panelCapacityKw: number
   batteryCapacityKwh?: number | null
   batteryType?: string | null

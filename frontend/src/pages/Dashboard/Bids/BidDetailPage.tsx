@@ -7,6 +7,7 @@ import {
   FileText,
   MapPin,
   ShieldCheck,
+  MessageCircle,
   Wrench,
 } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -14,6 +15,7 @@ import { useEffect, useState } from 'react'
 
 import DashboardShell from '../../../components/dashboard/DashboardShell'
 import { getRequestBidById, type RequestBid } from '../../../services/bid.service'
+import {createNegotiation} from '../../../services/negotiation.service'
 
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString(undefined, {
@@ -39,6 +41,8 @@ function BidDetailPage() {
   const [requestTitle, setRequestTitle] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [startingNegotiation, setStartingNegotiation] = useState(false)
+  const [negotiationError, setNegotiationError] = useState('') 
 
   useEffect(() => {
     if (!requestId || !bidId) {
@@ -71,6 +75,32 @@ function BidDetailPage() {
 
     void loadBid()
   }, [requestId, bidId])
+  const handleStartNegotiation = async () => {
+  if (!bidId) {
+    return
+  }
+
+  try {
+    setStartingNegotiation(true)
+    setNegotiationError('')
+
+    const response = await createNegotiation(bidId)
+
+    if (!response.success || !response.negotiation?.id) {
+      throw new Error(response.message || 'Unable to start negotiation.')
+    }
+
+    navigate(`/dashboard/negotiations?negotiationId=${response.negotiation.id}`)
+  } catch (err) {
+    setNegotiationError(
+      err instanceof Error
+        ? err.message
+        : 'Unable to start negotiation.',
+    )
+  } finally {
+    setStartingNegotiation(false)
+  }
+}
 
   return (
     <DashboardShell role="BUYER">
@@ -133,12 +163,29 @@ function BidDetailPage() {
                   </div>
                 </div>
 
-                <Link
-                  to={`/dashboard/compare?requestId=${requestId}`}
-                  className="inline-flex items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] px-4 py-2.5 text-xs font-semibold transition hover:border-[var(--copper)]/50"
-                >
-                  Compare bids
-                </Link>
+                <div className="flex flex-wrap gap-2">
+  <Link
+    to={`/dashboard/compare?requestId=${requestId}`}
+    className="inline-flex items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] px-4 py-2.5 text-xs font-semibold transition hover:border-[var(--copper)]/50"
+  >
+    Compare bids
+  </Link>
+
+  <button
+    type="button"
+    onClick={handleStartNegotiation}
+    disabled={startingNegotiation}
+    className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--copper)] px-4 py-2.5 text-xs font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+  >
+    <MessageCircle size={14} />
+    {startingNegotiation ? 'Starting...' : 'Start Negotiation'}
+  </button>
+</div>
+{negotiationError && (
+  <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-500">
+    {negotiationError}
+  </div>
+)}
               </div>
             </section>
 

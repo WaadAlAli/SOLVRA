@@ -198,17 +198,23 @@ Return exactly this structure:
     max_tokens: 1200,
   })
 
-  const content = response.choices[0]?.message?.content
+ const content = response.choices[0]?.message?.content
 
-  if (!content) {
-    throw new Error('AI returned an empty response')
-  }
+if (!content) {
+  throw new Error('AI returned an empty response')
+}
 
-  let parsed: unknown
+let parsed: unknown
 
-  
+try {
+  parsed = JSON.parse(content)
+} catch {
+  console.error('AI returned invalid JSON:', content)
 
-  const validation = requirementExtractionSchema.safeParse(parsed)
+  throw new Error('AI returned invalid JSON')
+}
+
+const validation = requirementExtractionSchema.safeParse(parsed)
 
   if (!validation.success) {
     console.error(

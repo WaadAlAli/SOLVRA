@@ -147,6 +147,12 @@ const handleLogout = async () => {
                   label="My Bids"
                   icon={FileText}
                 />
+                  <DashboardNavItem
+                to="/supplier/negotiations"
+                label="Negotiations"
+                icon={Handshake}
+                />
+
               </div>
             </div>
 

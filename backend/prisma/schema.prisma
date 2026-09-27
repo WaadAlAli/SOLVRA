@@ -96,6 +96,7 @@ enum ActivityAction {
   SUPPLIER_VERIFIED
   USER_DEACTIVATED
 }
+
 enum Currency {
   USD
   LBP
@@ -128,6 +129,7 @@ enum TargetTimeline {
   SIX_TO_TWELVE_MONTHS
   FLEXIBLE
 }
+
 // ============================================================
 // USER
 // ============================================================
@@ -207,27 +209,27 @@ model SupplierProfile {
 // ============================================================
 
 model SolarRequest {
-  id             String        @id @default(uuid())
-  buyerId        String
+  id      String @id @default(uuid())
+  buyerId String
 
-  title          String
-  propertyType   PropertyType
-  location       String
+  title        String
+  propertyType PropertyType
+  location     String
 
-  status         RequestStatus @default(DRAFT)
+  status RequestStatus @default(DRAFT)
 
-  budget         Decimal?      @db.Decimal(14, 2)
-  currency       Currency?
+  budget   Decimal?  @db.Decimal(14, 2)
+  currency Currency?
 
   rawDescription String
 
-  monthlyElectricityBill   Decimal? @db.Decimal(14, 2)
+  monthlyElectricityBill    Decimal? @db.Decimal(14, 2)
   averageMonthlyConsumption Decimal? @db.Decimal(14, 2)
 
-  roofType   RoofType?
-  ownership  PropertyOwnership?
-  priority   RequestPriority?
-  timeline   TargetTimeline?
+  roofType  RoofType?
+  ownership PropertyOwnership?
+  priority  RequestPriority?
+  timeline  TargetTimeline?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -301,6 +303,7 @@ model Bid {
   requestId  String
   supplierId String
 
+  title      String?
   status BidStatus @default(SUBMITTED)
 
   createdAt DateTime @default(now())
@@ -312,7 +315,6 @@ model Bid {
   negotiations Negotiation[]
   activityLogs ActivityLog[]
 
-  @@unique([requestId, supplierId])
   @@index([requestId])
   @@index([supplierId])
 }

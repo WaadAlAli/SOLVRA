@@ -81,6 +81,27 @@ export interface SendNegotiationMessageResponse {
   message: string
   entry: NegotiationMessage
 }
+export interface CreateNegotiationResponse {
+  success: boolean
+  created?: boolean
+  message: string
+  negotiation: {
+    id: string
+    bidId: string
+    status: string
+    createdAt?: string
+  }
+}
+
+export async function createNegotiation(
+  bidId: string,
+): Promise<CreateNegotiationResponse> {
+  const response = await api.post<CreateNegotiationResponse>(
+    `/negotiations/bids/${bidId}`,
+  )
+
+  return response.data
+}
 
 export async function getMyNegotiations(): Promise<NegotiationsListResponse> {
   const response = await api.get<NegotiationsListResponse>('/negotiations')
