@@ -11,7 +11,10 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import DashboardShell from '../../../components/dashboard/DashboardShell'
-import { getMyRequests, type SolarRequest } from '../../../services/request.service'
+import {
+  getMyRequests,
+  type SolarRequest,
+} from '../../../services/request.service'
 import {
   getRequestInsights,
   type AiInsightConflict,
@@ -26,9 +29,13 @@ function InsightsPage() {
   const [selectedRequestId, setSelectedRequestId] = useState('')
   const [summary, setSummary] = useState('')
   const [keyDifferences, setKeyDifferences] = useState<AiInsightEntry[]>([])
-  const [missingInformation, setMissingInformation] = useState<AiInsightMissingInfo[]>([])
+  const [missingInformation, setMissingInformation] = useState<
+    AiInsightMissingInfo[]
+  >([])
   const [conflicts, setConflicts] = useState<AiInsightConflict[]>([])
-  const [considerations, setConsiderations] = useState<AiInsightConsideration[]>([])
+  const [considerations, setConsiderations] = useState<
+    AiInsightConsideration[]
+  >([])
   const [requiresConfirmation, setRequiresConfirmation] = useState(true)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -52,9 +59,7 @@ function InsightsPage() {
         setSelectedRequestId('')
       }
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Unable to load requests.',
-      )
+      setError(err instanceof Error ? err.message : 'Unable to load requests.')
     } finally {
       setLoading(false)
     }
@@ -139,7 +144,9 @@ function InsightsPage() {
 
         {!loading && error && (
           <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-6">
-            <p className="text-sm font-semibold text-red-500">Unable to load AI insights</p>
+            <p className="text-sm font-semibold text-red-500">
+              Unable to load AI insights
+            </p>
             <p className="mt-2 text-sm text-[var(--text-secondary)]">{error}</p>
 
             <button
@@ -165,7 +172,9 @@ function InsightsPage() {
                   {requests.length > 0 ? (
                     <select
                       value={selectedRequestId}
-                      onChange={(event) => setSelectedRequestId(event.target.value)}
+                      onChange={(event) =>
+                        setSelectedRequestId(event.target.value)
+                      }
                       className="mt-3 h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] px-3 text-sm text-[var(--text-primary)] outline-none focus:border-[#00E5FF]/50"
                     >
                       {requests.map((request) => (
@@ -182,7 +191,10 @@ function InsightsPage() {
                 </div>
 
                 <div className="rounded-xl border border-[#00E5FF]/15 bg-[#00E5FF]/[0.03] px-3 py-2 text-sm text-[var(--text-secondary)]">
-                  <span className="font-semibold text-[#00E5FF]">AI INSIGHT</span> — CONFIRM TO SAVE
+                  <span className="font-semibold text-[#00E5FF]">
+                    AI INSIGHT
+                  </span>{' '}
+                  — CONFIRM TO SAVE
                 </div>
               </div>
             </section>
@@ -193,7 +205,9 @@ function InsightsPage() {
                   <FileText size={20} />
                 </div>
 
-                <h3 className="mt-5 text-lg font-semibold">No solar requests yet.</h3>
+                <h3 className="mt-5 text-lg font-semibold">
+                  No solar requests yet.
+                </h3>
                 <p className="mt-2 text-sm text-[var(--text-secondary)]">
                   Create a request to see AI insights for supplier proposals.
                 </p>
@@ -222,7 +236,9 @@ function InsightsPage() {
 
                   <div className="mt-5 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">
                     <CheckCircle2 size={14} className="text-[#00E5FF]" />
-                    {requiresConfirmation ? 'Requires buyer confirmation' : 'No confirmation required'}
+                    {requiresConfirmation
+                      ? 'Requires buyer confirmation'
+                      : 'No confirmation required'}
                   </div>
                 </section>
 
@@ -237,14 +253,21 @@ function InsightsPage() {
                         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
                           {item.supplierName || 'Supplier'}
                         </p>
-                        <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">{item.insight}</p>
+                        <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+                          {item.insight}
+                        </p>
                       </div>
                     )}
                   />
 
                   <InsightCard
                     title="Missing information"
-                    icon={<AlertTriangle size={16} className="text-[var(--copper)]" />}
+                    icon={
+                      <AlertTriangle
+                        size={16}
+                        className="text-[var(--copper)]"
+                      />
+                    }
                     items={missingInformation}
                     emptyMessage="No critical missing information was flagged by the AI."
                     renderItem={(item) => (
@@ -252,8 +275,12 @@ function InsightsPage() {
                         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
                           {item.supplierName || 'Supplier'}
                         </p>
-                        <p className="mt-2 text-sm font-medium text-[var(--text-primary)]">{item.item}</p>
-                        <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">{item.detail}</p>
+                        <p className="mt-2 text-sm font-medium text-[var(--text-primary)]">
+                          {item.item}
+                        </p>
+                        <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
+                          {item.detail}
+                        </p>
                       </div>
                     )}
                   />
@@ -268,14 +295,18 @@ function InsightsPage() {
                         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
                           {item.supplierName || 'Supplier'}
                         </p>
-                        <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">{item.issue}</p>
+                        <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+                          {item.issue}
+                        </p>
                       </div>
                     )}
                   />
 
                   <InsightCard
                     title="Buyer considerations"
-                    icon={<CheckCircle2 size={16} className="text-emerald-400" />}
+                    icon={
+                      <CheckCircle2 size={16} className="text-emerald-400" />
+                    }
                     items={considerations}
                     emptyMessage="No additional buyer considerations were flagged."
                     renderItem={(item) => (
@@ -283,8 +314,12 @@ function InsightsPage() {
                         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
                           {item.supplierName || 'Supplier'}
                         </p>
-                        <p className="mt-2 text-sm font-medium text-[var(--text-primary)]">{item.item}</p>
-                        <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">{item.detail}</p>
+                        <p className="mt-2 text-sm font-medium text-[var(--text-primary)]">
+                          {item.item}
+                        </p>
+                        <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
+                          {item.detail}
+                        </p>
                       </div>
                     )}
                   />
@@ -298,8 +333,14 @@ function InsightsPage() {
 
                   <ul className="mt-4 space-y-3 text-sm leading-6 text-[var(--text-secondary)]">
                     <li>• AI explains differences and risk signals only.</li>
-                    <li>• AI does not rank suppliers, award contracts, or change bid data.</li>
-                    <li>• The buyer confirms any saved insight before it becomes a project action.</li>
+                    <li>
+                      • AI does not rank suppliers, award contracts, or change
+                      bid data.
+                    </li>
+                    <li>
+                      • The buyer confirms any saved insight before it becomes a
+                      project action.
+                    </li>
                   </ul>
                 </div>
               </>
@@ -328,15 +369,22 @@ function InsightCard<T>({
     <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] p-5">
       <div className="flex items-center gap-2">
         {icon}
-        <h2 className="text-sm font-semibold text-[var(--text-primary)]">{title}</h2>
+        <h2 className="text-sm font-semibold text-[var(--text-primary)]">
+          {title}
+        </h2>
       </div>
 
       <div className="mt-4 space-y-4">
         {items.length === 0 ? (
-          <p className="text-sm leading-6 text-[var(--text-secondary)]">{emptyMessage}</p>
+          <p className="text-sm leading-6 text-[var(--text-secondary)]">
+            {emptyMessage}
+          </p>
         ) : (
           items.map((item, index) => (
-            <div key={`${title}-${index}`} className="rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] p-4">
+            <div
+              key={`${title}-${index}`}
+              className="rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] p-4"
+            >
               {renderItem(item)}
             </div>
           ))

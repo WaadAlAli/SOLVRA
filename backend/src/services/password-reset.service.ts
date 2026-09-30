@@ -9,9 +9,7 @@ import type {
   ResetPasswordInput,
 } from '../validators/auth.validator.js'
 
-export async function requestPasswordReset(
-  input: ForgotPasswordInput,
-) {
+export async function requestPasswordReset(input: ForgotPasswordInput) {
   const user = await prisma.user.findUnique({
     where: {
       email: input.email,
@@ -36,11 +34,7 @@ export async function requestPasswordReset(
     },
   })
 
-  const {
-    rawToken,
-    tokenHash,
-    expiresAt,
-  } = generatePasswordResetToken()
+  const { rawToken, tokenHash, expiresAt } = generatePasswordResetToken()
 
   await prisma.passwordResetToken.create({
     data: {
@@ -55,31 +49,20 @@ export async function requestPasswordReset(
   }
 }
 
-export async function resetPassword(
-  input: ResetPasswordInput,
-) {
-  const tokenHash = hashPasswordResetToken(
-    input.token,
-  )
+export async function resetPassword(input: ResetPasswordInput) {
+  const tokenHash = hashPasswordResetToken(input.token)
 
-  const resetToken =
-    await prisma.passwordResetToken.findUnique({
-      where: {
-        tokenHash,
-      },
-    })
+  const resetToken = await prisma.passwordResetToken.findUnique({
+    where: {
+      tokenHash,
+    },
+  })
 
-  if (
-    !resetToken ||
-    resetToken.usedAt ||
-    resetToken.expiresAt <= new Date()
-  ) {
+  if (!resetToken || resetToken.usedAt || resetToken.expiresAt <= new Date()) {
     throw new Error('INVALID_RESET_TOKEN')
   }
 
-  const passwordHash = await hashPassword(
-    input.password,
-  )
+  const passwordHash = await hashPassword(input.password)
 
   await prisma.$transaction(async (tx) => {
     await tx.user.update({

@@ -1,16 +1,6 @@
 import { useEffect, useState } from 'react'
-import {
-  ArrowRight,
-  CheckCircle2,
-  Eye,
-  EyeOff,
-  Loader2,
-} from 'lucide-react'
-import {
-  Link,
-  useLocation,
-  useNavigate,
-} from 'react-router-dom'
+import { ArrowRight, CheckCircle2, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import AuthShell from '../../components/auth/AuthShell'
 import { login } from '../../services/auth.service'
@@ -31,8 +21,9 @@ function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [registeredMessage, setRegisteredMessage] =
-    useState(Boolean(state?.registered))
+  const [registeredMessage, setRegisteredMessage] = useState(
+    Boolean(state?.registered),
+  )
 
   useEffect(() => {
     if (state?.registered) {
@@ -40,9 +31,7 @@ function LoginPage() {
     }
   }, [state?.registered])
 
-  const handleSubmit = async (
-    event: React.FormEvent<HTMLFormElement>,
-  ) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     setError('')
@@ -56,17 +45,13 @@ function LoginPage() {
 
       if (response.success) {
         const destination =
-          response.user?.role === 'SUPPLIER'
-            ? '/supplier'
-            : '/dashboard'
+          response.user?.role === 'SUPPLIER' ? '/supplier' : '/dashboard'
 
         navigate(destination, { replace: true })
       }
     } catch (error) {
       setError(
-        error instanceof Error
-          ? error.message
-          : 'Unable to sign you in.',
+        error instanceof Error ? error.message : 'Unable to sign you in.',
       )
     } finally {
       setLoading(false)
@@ -89,10 +74,7 @@ function LoginPage() {
         </>
       }
     >
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-5"
-      >
+      <form onSubmit={handleSubmit} className="space-y-5">
         {registeredMessage && (
           <div className="flex items-start gap-3 rounded-xl border border-[#D47A3A]/20 bg-[#D47A3A]/5 px-4 py-3.5">
             <CheckCircle2
@@ -113,10 +95,7 @@ function LoginPage() {
         )}
 
         <div>
-          <label
-            htmlFor="email"
-            className="mb-2 block text-sm font-medium"
-          >
+          <label htmlFor="email" className="mb-2 block text-sm font-medium">
             Work email
           </label>
 
@@ -138,10 +117,7 @@ function LoginPage() {
 
         <div>
           <div className="mb-2 flex items-center justify-between">
-            <label
-              htmlFor="password"
-              className="text-sm font-medium"
-            >
+            <label htmlFor="password" className="text-sm font-medium">
               Password
             </label>
 
@@ -159,9 +135,7 @@ function LoginPage() {
               type={showPassword ? 'text' : 'password'}
               autoComplete="current-password"
               value={password}
-              onChange={(event) =>
-                setPassword(event.target.value)
-              }
+              onChange={(event) => setPassword(event.target.value)}
               placeholder="Enter your password"
               required
               className="h-12 w-full rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] px-4 pr-12 text-sm outline-none transition placeholder:text-[var(--text-muted)] focus:border-[var(--copper)] focus:ring-2 focus:ring-[var(--copper)]/10"
@@ -169,21 +143,11 @@ function LoginPage() {
 
             <button
               type="button"
-              onClick={() =>
-                setShowPassword((value) => !value)
-              }
+              onClick={() => setShowPassword((value) => !value)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] transition hover:text-[var(--text-primary)]"
-              aria-label={
-                showPassword
-                  ? 'Hide password'
-                  : 'Show password'
-              }
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
-              {showPassword ? (
-                <EyeOff size={18} />
-              ) : (
-                <Eye size={18} />
-              )}
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
         </div>
@@ -200,10 +164,7 @@ function LoginPage() {
           className="group flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--copper)] text-sm font-semibold text-white transition hover:bg-[var(--copper-hover)] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? (
-            <Loader2
-              size={18}
-              className="animate-spin"
-            />
+            <Loader2 size={18} className="animate-spin" />
           ) : (
             <>
               Sign in

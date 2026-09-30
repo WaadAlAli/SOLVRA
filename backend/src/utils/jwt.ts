@@ -15,23 +15,15 @@ function getJwtSecret(): string {
   return secret
 }
 
-export function generateAccessToken(
-  payload: AuthTokenPayload,
-): string {
-  const expiresIn = (
-    process.env.JWT_EXPIRES_IN ?? '7d'
-  ) as SignOptions['expiresIn']
+export function generateAccessToken(payload: AuthTokenPayload): string {
+  const expiresIn = (process.env.JWT_EXPIRES_IN ??
+    '7d') as SignOptions['expiresIn']
 
   return jwt.sign(payload, getJwtSecret(), {
     expiresIn,
   })
 }
 
-export function verifyAccessToken(
-  token: string,
-): AuthTokenPayload {
-  return jwt.verify(
-    token,
-    getJwtSecret(),
-  ) as AuthTokenPayload
+export function verifyAccessToken(token: string): AuthTokenPayload {
+  return jwt.verify(token, getJwtSecret()) as AuthTokenPayload
 }

@@ -58,9 +58,7 @@ export interface InsightPromptInput {
 
 const MODEL = 'openai/gpt-oss-120b'
 
-export async function analyzeRequestInsights(
-  input: InsightPromptInput,
-) {
+export async function analyzeRequestInsights(input: InsightPromptInput) {
   const { request, bids } = input
 
   const normalizedBids = bids.map((bid) => ({
@@ -84,10 +82,7 @@ export async function analyzeRequestInsights(
       ]
 
       const value = possible.find(
-        (entry) =>
-          entry !== null &&
-          entry !== undefined &&
-          entry !== '',
+        (entry) => entry !== null && entry !== undefined && entry !== '',
       )
 
       return value === undefined ? null : Number(value)
@@ -101,7 +96,9 @@ export async function analyzeRequestInsights(
       bid.latestVersion?.batteryCapacityKwh == null ? 'battery storage' : null,
       !bid.latestVersion?.inverterSpec ? 'inverter' : null,
       bid.latestVersion?.warrantyYears == null ? 'warranty' : null,
-      bid.latestVersion?.deliveryTimeDays == null ? 'installation timeline' : null,
+      bid.latestVersion?.deliveryTimeDays == null
+        ? 'installation timeline'
+        : null,
       !bid.latestVersion?.paymentTerms ? 'payment terms' : null,
       !bid.latestVersion?.changeSummary ? 'supplier notes' : null,
     ].filter(Boolean),
@@ -214,9 +211,9 @@ Return the COMPLETE JSON object. Never stop in the middle of a JSON string or ob
     max_tokens: 2500,
   })
 
-  const content = response.choices[0]?.message?.content
+  const content = response?.choices?.[0]?.message?.content
 
-  if (!content) {
+  if (!content?.trim()) {
     throw new Error('AI returned an empty response')
   }
 
@@ -231,19 +228,13 @@ Return the COMPLETE JSON object. Never stop in the middle of a JSON string or ob
       .trim()
 
     parsed = JSON.parse(cleanedContent)
-  } catch (error) {
-    console.error('AI insight JSON parsing error:', error)
-    console.error('AI response content:', content)
-
+  } catch {
     throw new Error('AI returned invalid JSON')
   }
 
   const validation = insightsAnalysisSchema.safeParse(parsed)
 
   if (!validation.success) {
-    console.error('AI insight validation error:', validation.error.flatten())
-    console.error('Parsed AI response:', parsed)
-
     throw new Error('AI returned an invalid insight structure')
   }
 

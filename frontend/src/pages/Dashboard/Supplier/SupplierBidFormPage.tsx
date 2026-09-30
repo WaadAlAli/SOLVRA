@@ -67,9 +67,10 @@ function SupplierBidFormPage() {
             setForm({
               title: bid.title || '',
               panelCapacityKw: String(version.panelCapacityKw ?? ''),
-              batteryCapacityKwh: version.batteryCapacityKwh != null
-                ? String(version.batteryCapacityKwh)
-                : '',
+              batteryCapacityKwh:
+                version.batteryCapacityKwh != null
+                  ? String(version.batteryCapacityKwh)
+                  : '',
               batteryType: version.batteryType || '',
               inverterSpec: version.inverterSpec || '',
               equipmentDetails: version.equipmentDetails
@@ -78,15 +79,18 @@ function SupplierBidFormPage() {
               installationCost: String(version.installationCost ?? ''),
               deliveryCost: String(version.deliveryCost ?? ''),
               commissioningCost: String(version.commissioningCost ?? ''),
-              maintenanceCost: version.maintenanceCost != null
-                ? String(version.maintenanceCost)
-                : '',
-              warrantyYears: version.warrantyYears != null
-                ? String(version.warrantyYears)
-                : '',
-              deliveryTimeDays: version.deliveryTimeDays != null
-                ? String(version.deliveryTimeDays)
-                : '',
+              maintenanceCost:
+                version.maintenanceCost != null
+                  ? String(version.maintenanceCost)
+                  : '',
+              warrantyYears:
+                version.warrantyYears != null
+                  ? String(version.warrantyYears)
+                  : '',
+              deliveryTimeDays:
+                version.deliveryTimeDays != null
+                  ? String(version.deliveryTimeDays)
+                  : '',
               paymentTerms: version.paymentTerms || '',
               totalPrice: String(version.totalPrice ?? ''),
               changeSummary: '',
@@ -105,9 +109,7 @@ function SupplierBidFormPage() {
         setRequestTitle(response.request.title)
       } catch (err) {
         setError(
-          err instanceof Error
-            ? err.message
-            : 'Unable to load the form.',
+          err instanceof Error ? err.message : 'Unable to load the form.',
         )
       } finally {
         setLoading(false)
@@ -117,19 +119,14 @@ function SupplierBidFormPage() {
     void loadData()
   }, [requestId, bidId, isVersionMode])
 
-  const updateField = (
-    field: keyof typeof defaultForm,
-    value: string,
-  ) => {
+  const updateField = (field: keyof typeof defaultForm, value: string) => {
     setForm((current) => ({
       ...current,
       [field]: value,
     }))
   }
 
-  const handleSubmit = async (
-    event: React.FormEvent<HTMLFormElement>,
-  ) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     if (!requestId && !bidId) {
@@ -160,9 +157,7 @@ function SupplierBidFormPage() {
           maintenanceCost: form.maintenanceCost
             ? Number(form.maintenanceCost)
             : null,
-          warrantyYears: form.warrantyYears
-            ? Number(form.warrantyYears)
-            : null,
+          warrantyYears: form.warrantyYears ? Number(form.warrantyYears) : null,
           deliveryTimeDays: form.deliveryTimeDays
             ? Number(form.deliveryTimeDays)
             : null,
@@ -197,9 +192,7 @@ function SupplierBidFormPage() {
         maintenanceCost: form.maintenanceCost
           ? Number(form.maintenanceCost)
           : null,
-        warrantyYears: form.warrantyYears
-          ? Number(form.warrantyYears)
-          : null,
+        warrantyYears: form.warrantyYears ? Number(form.warrantyYears) : null,
         deliveryTimeDays: form.deliveryTimeDays
           ? Number(form.deliveryTimeDays)
           : null,
@@ -256,8 +249,8 @@ function SupplierBidFormPage() {
 
           {isVersionMode && currentVersion && (
             <p className="mt-2 text-sm text-[var(--text-secondary)]">
-              Current version: Version {currentVersion} · Your submission
-              will create Version {currentVersion + 1}
+              Current version: Version {currentVersion} · Your submission will
+              create Version {currentVersion + 1}
             </p>
           )}
         </div>
@@ -538,4 +531,3 @@ function SupplierBidFormPage() {
 }
 
 export default SupplierBidFormPage
-

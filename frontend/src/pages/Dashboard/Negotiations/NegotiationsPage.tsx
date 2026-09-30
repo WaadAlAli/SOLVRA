@@ -85,9 +85,7 @@ function NegotiationsPage() {
       })
     } catch (err) {
       setError(
-        err instanceof Error
-          ? err.message
-          : 'Unable to load negotiations.',
+        err instanceof Error ? err.message : 'Unable to load negotiations.',
       )
     }
   }, [])
@@ -116,8 +114,7 @@ function NegotiationsPage() {
           request: detail.request,
           supplier: detail.supplier,
           proposal: detail.proposal,
-          lastActivityAt:
-            detail.messages.at(-1)?.createdAt ?? detail.createdAt,
+          lastActivityAt: detail.messages.at(-1)?.createdAt ?? detail.createdAt,
           messageCount: detail.messages.length,
         }
 
@@ -201,11 +198,7 @@ function NegotiationsPage() {
       await loadDetail(selectedId)
       await loadNegotiations()
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Unable to send message.',
-      )
+      setError(err instanceof Error ? err.message : 'Unable to send message.')
     } finally {
       setSending(false)
     }
@@ -504,8 +497,7 @@ function NegotiationsPage() {
                       </div>
                     ) : (
                       messages.map((message) => {
-                        const isMine =
-                          message.authorType === role
+                        const isMine = message.authorType === role
 
                         return (
                           <div
@@ -530,9 +522,7 @@ function NegotiationsPage() {
                                       : 'Supplier'}
                                 </span>
 
-                                <span>
-                                  {formatDate(message.createdAt)}
-                                </span>
+                                <span>{formatDate(message.createdAt)}</span>
                               </div>
 
                               <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-[var(--text-secondary)]">
@@ -549,19 +539,14 @@ function NegotiationsPage() {
                   <div className="border-t border-[var(--border)] p-5">
                     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-primary)] p-4">
                       <label className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">
-                        {isBuyer
-                          ? 'Message supplier'
-                          : 'Message buyer'}
+                        {isBuyer ? 'Message supplier' : 'Message buyer'}
                       </label>
 
                       <textarea
                         value={draft}
                         onChange={(event) => setDraft(event.target.value)}
                         onKeyDown={(event) => {
-                          if (
-                            event.key === 'Enter' &&
-                            !event.shiftKey
-                          ) {
+                          if (event.key === 'Enter' && !event.shiftKey) {
                             event.preventDefault()
                             void handleSend()
                           }
@@ -612,13 +597,7 @@ function NegotiationsPage() {
   )
 }
 
-function InfoChip({
-  label,
-  value,
-}: {
-  label: string
-  value: string
-}) {
+function InfoChip({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] p-3">
       <p className="text-[9px] uppercase tracking-[0.12em] text-[var(--text-muted)]">
@@ -633,4 +612,3 @@ function InfoChip({
 }
 
 export default NegotiationsPage
-

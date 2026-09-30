@@ -17,10 +17,15 @@ function toNumber(value: unknown): number | null {
   return Number.isFinite(numeric) ? numeric : null
 }
 
-function getEstimatedAnnualProduction(latestVersion: {
-  equipmentDetails?: unknown
-} | null): number | null {
-  if (!latestVersion?.equipmentDetails || typeof latestVersion.equipmentDetails !== 'object') {
+function getEstimatedAnnualProduction(
+  latestVersion: {
+    equipmentDetails?: unknown
+  } | null,
+): number | null {
+  if (
+    !latestVersion?.equipmentDetails ||
+    typeof latestVersion.equipmentDetails !== 'object'
+  ) {
     return null
   }
 
@@ -48,32 +53,46 @@ function getEstimatedAnnualProduction(latestVersion: {
   return null
 }
 
-function getMissingInformation(latestVersion: {
-  totalPrice?: unknown
-  panelCapacityKw?: unknown
-  batteryCapacityKwh?: unknown
-  inverterSpec?: string | null
-  warrantyYears?: number | null
-  paymentTerms?: string | null
-  deliveryTimeDays?: number | null
-  changeSummary?: string | null
-  equipmentDetails?: unknown
-} | null): string[] {
+function getMissingInformation(
+  latestVersion: {
+    totalPrice?: unknown
+    panelCapacityKw?: unknown
+    batteryCapacityKwh?: unknown
+    inverterSpec?: string | null
+    warrantyYears?: number | null
+    paymentTerms?: string | null
+    deliveryTimeDays?: number | null
+    changeSummary?: string | null
+    equipmentDetails?: unknown
+  } | null,
+): string[] {
   if (!latestVersion) {
     return ['No bid version available']
   }
 
   const missing: string[] = []
 
-  if (latestVersion.totalPrice === null || latestVersion.totalPrice === undefined || latestVersion.totalPrice === '') {
+  if (
+    latestVersion.totalPrice === null ||
+    latestVersion.totalPrice === undefined ||
+    latestVersion.totalPrice === ''
+  ) {
     missing.push('Price')
   }
 
-  if (latestVersion.panelCapacityKw === null || latestVersion.panelCapacityKw === undefined || latestVersion.panelCapacityKw === '') {
+  if (
+    latestVersion.panelCapacityKw === null ||
+    latestVersion.panelCapacityKw === undefined ||
+    latestVersion.panelCapacityKw === ''
+  ) {
     missing.push('System capacity')
   }
 
-  if (latestVersion.batteryCapacityKwh === null || latestVersion.batteryCapacityKwh === undefined || latestVersion.batteryCapacityKwh === '') {
+  if (
+    latestVersion.batteryCapacityKwh === null ||
+    latestVersion.batteryCapacityKwh === undefined ||
+    latestVersion.batteryCapacityKwh === ''
+  ) {
     missing.push('Battery storage')
   }
 
@@ -81,13 +100,18 @@ function getMissingInformation(latestVersion: {
     missing.push('Inverter')
   }
 
-  if (latestVersion.warrantyYears === null || latestVersion.warrantyYears === undefined) {
+  if (
+    latestVersion.warrantyYears === null ||
+    latestVersion.warrantyYears === undefined
+  ) {
     missing.push('Warranty')
   }
 
-  const details = typeof latestVersion.equipmentDetails === 'object' && latestVersion.equipmentDetails !== null
-    ? (latestVersion.equipmentDetails as Record<string, unknown>)
-    : {}
+  const details =
+    typeof latestVersion.equipmentDetails === 'object' &&
+    latestVersion.equipmentDetails !== null
+      ? (latestVersion.equipmentDetails as Record<string, unknown>)
+      : {}
 
   const production = [
     details.estimatedAnnualProduction,
@@ -101,7 +125,10 @@ function getMissingInformation(latestVersion: {
     missing.push('Estimated annual production')
   }
 
-  if (latestVersion.deliveryTimeDays === null || latestVersion.deliveryTimeDays === undefined) {
+  if (
+    latestVersion.deliveryTimeDays === null ||
+    latestVersion.deliveryTimeDays === undefined
+  ) {
     missing.push('Installation timeline')
   }
 
@@ -213,8 +240,12 @@ export async function getRequestComparison(
           : null,
         currency: request.currency ?? null,
         totalPrice: latestVersion ? toNumber(latestVersion.totalPrice) : null,
-        systemCapacity: latestVersion ? toNumber(latestVersion.panelCapacityKw) : null,
-        batteryStorageKwh: latestVersion ? toNumber(latestVersion.batteryCapacityKwh) : null,
+        systemCapacity: latestVersion
+          ? toNumber(latestVersion.panelCapacityKw)
+          : null,
+        batteryStorageKwh: latestVersion
+          ? toNumber(latestVersion.batteryCapacityKwh)
+          : null,
         inverter: latestVersion?.inverterSpec ?? null,
         warrantyYears: latestVersion?.warrantyYears ?? null,
         estimatedAnnualProduction: getEstimatedAnnualProduction(latestVersion),

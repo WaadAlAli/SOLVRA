@@ -62,23 +62,15 @@ function EditRequestPage() {
         setLocation(data.location)
         setDescription(data.rawDescription)
         setCurrency(data.currency ?? '')
-        setMonthlyBill(
-          data.monthlyElectricityBill?.toString() ?? '',
-        )
-        setConsumption(
-          data.averageMonthlyConsumption?.toString() ?? '',
-        )
+        setMonthlyBill(data.monthlyElectricityBill?.toString() ?? '')
+        setConsumption(data.averageMonthlyConsumption?.toString() ?? '')
         setRoofType(data.roofType ?? '')
         setOwnership(data.ownership ?? '')
         setBudget(data.budget?.toString() ?? '')
         setPriority(data.priority ?? '')
         setTimeline(data.timeline ?? '')
       } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : 'Unable to load request.',
-        )
+        setError(err instanceof Error ? err.message : 'Unable to load request.')
       } finally {
         setLoading(false)
       }
@@ -90,7 +82,12 @@ function EditRequestPage() {
   const handleSave = async () => {
     if (!requestId) return
 
-    if (!title.trim() || !description.trim() || !propertyType || !location.trim()) {
+    if (
+      !title.trim() ||
+      !description.trim() ||
+      !propertyType ||
+      !location.trim()
+    ) {
       setError(
         'Please complete the title, description, property type, and location.',
       )
@@ -107,18 +104,12 @@ function EditRequestPage() {
         location: location.trim(),
         rawDescription: description.trim(),
         ...(currency ? { currency: currency as Currency } : {}),
-        ...(monthlyBill
-          ? { monthlyElectricityBill: Number(monthlyBill) }
-          : {}),
+        ...(monthlyBill ? { monthlyElectricityBill: Number(monthlyBill) } : {}),
         ...(consumption
           ? { averageMonthlyConsumption: Number(consumption) }
           : {}),
-        ...(roofType
-          ? { roofType: roofType as RoofType }
-          : {}),
-        ...(ownership
-          ? { ownership: ownership as PropertyOwnership }
-          : {}),
+        ...(roofType ? { roofType: roofType as RoofType } : {}),
+        ...(ownership ? { ownership: ownership as PropertyOwnership } : {}),
         ...(budget ? { budgetMax: Number(budget) } : {}),
         ...(priority
           ? {
@@ -134,11 +125,7 @@ function EditRequestPage() {
 
       navigate(`/dashboard/requests/${requestId}`)
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Unable to save changes.',
-      )
+      setError(err instanceof Error ? err.message : 'Unable to save changes.')
     } finally {
       setSaving(false)
     }
@@ -161,9 +148,7 @@ function EditRequestPage() {
           <p className="text-sm font-semibold text-red-500">
             Unable to load request
           </p>
-          <p className="mt-2 text-sm text-[var(--text-secondary)]">
-            {error}
-          </p>
+          <p className="mt-2 text-sm text-[var(--text-secondary)]">{error}</p>
           <Link
             to="/dashboard/requests"
             className="mt-4 inline-flex items-center gap-2 text-xs font-semibold"
@@ -231,11 +216,7 @@ function EditRequestPage() {
 
         <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] p-5 sm:p-7">
           <div className="grid gap-5 sm:grid-cols-2">
-            <Field
-              label="Project title"
-              value={title}
-              onChange={setTitle}
-            />
+            <Field label="Project title" value={title} onChange={setTitle} />
 
             <Select
               label="Property type"
@@ -249,11 +230,7 @@ function EditRequestPage() {
             />
 
             <div className="sm:col-span-2">
-              <Field
-                label="Location"
-                value={location}
-                onChange={setLocation}
-              />
+              <Field label="Location" value={location} onChange={setLocation} />
             </div>
 
             <div className="sm:col-span-2">
@@ -380,12 +357,7 @@ interface FieldProps {
   type?: string
 }
 
-function Field({
-  label,
-  value,
-  onChange,
-  type = 'text',
-}: FieldProps) {
+function Field({ label, value, onChange, type = 'text' }: FieldProps) {
   return (
     <div>
       <label className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--text-muted)]">
@@ -409,12 +381,7 @@ interface SelectProps {
   options: [string, string][]
 }
 
-function Select({
-  label,
-  value,
-  onChange,
-  options,
-}: SelectProps) {
+function Select({ label, value, onChange, options }: SelectProps) {
   return (
     <div>
       <label className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--text-muted)]">
@@ -439,4 +406,3 @@ function Select({
 }
 
 export default EditRequestPage
-

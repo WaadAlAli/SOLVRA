@@ -1,7 +1,7 @@
 import { prisma } from '../config/prisma.js'
-import { comparePassword ,hashPassword } from '../utils/password.js'
+import { comparePassword, hashPassword } from '../utils/password.js'
 import { generateAccessToken } from '../utils/jwt.js'
-import type {LoginInput,RegisterInput } from '../validators/auth.validator.js'
+import type { LoginInput, RegisterInput } from '../validators/auth.validator.js'
 
 export async function registerUser(input: RegisterInput) {
   const existingUser = await prisma.user.findUnique({
@@ -75,9 +75,7 @@ export async function registerUser(input: RegisterInput) {
         userWithProfiles?.buyerProfile?.displayName ??
         userWithProfiles?.supplierProfile?.companyName ??
         null,
-      companyName:
-        userWithProfiles?.supplierProfile?.companyName ??
-        null,
+      companyName: userWithProfiles?.supplierProfile?.companyName ?? null,
     },
   }
 }
@@ -125,9 +123,7 @@ export async function loginUser(input: LoginInput) {
         user.buyerProfile?.displayName ??
         user.supplierProfile?.companyName ??
         null,
-      companyName:
-        user.supplierProfile?.companyName ??
-        null,
+      companyName: user.supplierProfile?.companyName ?? null,
     },
   }
 }

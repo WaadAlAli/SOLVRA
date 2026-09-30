@@ -63,33 +63,33 @@ function BuyerSupplierSection() {
         <div className="grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-24">
           <div>
             <div className="flex items-center gap-3">
-  <span className="text-[10px] font-bold tracking-[0.18em] text-[var(--text-muted)]">
-    05
-  </span>
+              <span className="text-[10px] font-bold tracking-[0.18em] text-[var(--text-muted)]">
+                05
+              </span>
 
-  <span className="h-px w-8 bg-[var(--border)]" />
+              <span className="h-px w-8 bg-[var(--border)]" />
 
-  <p className="text-xs font-bold tracking-[0.18em] text-[#D47A3A]">
-    ONE PROCUREMENT NETWORK
-  </p>
-</div>
+              <p className="text-xs font-bold tracking-[0.18em] text-[#D47A3A]">
+                ONE PROCUREMENT NETWORK
+              </p>
+            </div>
 
             <div className="mt-5 h-px w-16 bg-[#D47A3A]" />
           </div>
 
           <div>
             <h2 className="max-w-4xl text-4xl font-bold leading-[1.08] tracking-[-0.035em] sm:text-5xl lg:text-[58px]">
-  One procurement network.
-  <span className="mt-2 block text-[var(--text-secondary)]">
-    Two connected workspaces.
-  </span>
-</h2>
+              One procurement network.
+              <span className="mt-2 block text-[var(--text-secondary)]">
+                Two connected workspaces.
+              </span>
+            </h2>
 
             <p className="mt-7 max-w-2xl text-base leading-7 text-[var(--text-secondary)] sm:text-lg sm:leading-8">
-  Buyers and suppliers work from different perspectives, but the same
-  structured procurement lifecycle keeps requirements, proposals,
-  negotiations, and decisions connected.
-</p>
+              Buyers and suppliers work from different perspectives, but the
+              same structured procurement lifecycle keeps requirements,
+              proposals, negotiations, and decisions connected.
+            </p>
           </div>
         </div>
 
@@ -238,9 +238,9 @@ function BuyerSupplierSection() {
           </div>
 
           <p className="text-sm leading-6 text-[var(--text-secondary)]">
-            Buyer requirements become supplier opportunities. Supplier
-            proposals become buyer decisions. SOLVRA keeps the workflow
-            connected from both sides.
+            Buyer requirements become supplier opportunities. Supplier proposals
+            become buyer decisions. SOLVRA keeps the workflow connected from
+            both sides.
           </p>
         </div>
       </div>

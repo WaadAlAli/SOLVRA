@@ -1,8 +1,6 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(
-  process.env.RESEND_API_KEY,
-)
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 function getRequiredEnv(name: string): string {
   const value = process.env[name]
@@ -18,11 +16,9 @@ export async function sendPasswordResetEmail(
   email: string,
   resetToken: string,
 ): Promise<void> {
-  const frontendUrl =
-    getRequiredEnv('FRONTEND_URL')
+  const frontendUrl = getRequiredEnv('FRONTEND_URL')
 
-  const resetUrl =
-    `${frontendUrl}/reset-password?token=${encodeURIComponent(resetToken)}`
+  const resetUrl = `${frontendUrl}/reset-password?token=${encodeURIComponent(resetToken)}`
 
   const from = getRequiredEnv('EMAIL_FROM')
 
@@ -109,13 +105,8 @@ export async function sendPasswordResetEmail(
   })
 
   if (error) {
-    console.error(
-      'Resend email error:',
-      error,
-    )
+    console.error('Resend email error:', error)
 
-    throw new Error(
-      'PASSWORD_RESET_EMAIL_FAILED',
-    )
+    throw new Error('PASSWORD_RESET_EMAIL_FAILED')
   }
 }

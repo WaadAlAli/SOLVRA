@@ -8,10 +8,7 @@ interface DashboardShellProps {
   role: 'BUYER' | 'SUPPLIER' | 'ADMIN'
 }
 
-function DashboardShell({
-  children,
-  role,
-}: DashboardShellProps) {
+function DashboardShell({ children, role }: DashboardShellProps) {
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]">
       <DashboardSidebar role={role} />
@@ -20,9 +17,7 @@ function DashboardShell({
         <DashboardHeader role={role} />
 
         <main className="px-5 pb-10 pt-6 sm:px-8 lg:px-10">
-          <div className="mx-auto max-w-[1500px]">
-            {children}
-          </div>
+          <div className="mx-auto max-w-[1500px]">{children}</div>
         </main>
       </div>
     </div>

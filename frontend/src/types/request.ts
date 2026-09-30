@@ -1,34 +1,16 @@
 export type RequestStep =
-  | 'PROJECT'
-  | 'ENERGY'
-  | 'SITE'
-  | 'PREFERENCES'
-  | 'REVIEW'
-  | 'SUBMIT'
+  'PROJECT' | 'ENERGY' | 'SITE' | 'PREFERENCES' | 'REVIEW' | 'SUBMIT'
 
-export type PropertyType =
-  | 'RESIDENTIAL'
-  | 'COMMERCIAL'
-  | 'INSTITUTIONAL'
+export type PropertyType = 'RESIDENTIAL' | 'COMMERCIAL' | 'INSTITUTIONAL'
 
 export type Currency = 'USD' | 'LBP'
 
-export type RoofType =
-  | 'FLAT'
-  | 'SLOPED'
-  | 'GROUND'
-  | 'UNKNOWN'
+export type RoofType = 'FLAT' | 'SLOPED' | 'GROUND' | 'UNKNOWN'
 
-export type PropertyOwnership =
-  | 'OWNED'
-  | 'RENTED'
-  | 'OTHER'
+export type PropertyOwnership = 'OWNED' | 'RENTED' | 'OTHER'
 
 export type RequestPriority =
-  | 'LOWEST_PRICE'
-  | 'BALANCED'
-  | 'QUALITY'
-  | 'RELIABILITY'
+  'LOWEST_PRICE' | 'BALANCED' | 'QUALITY' | 'RELIABILITY'
 
 export type TargetTimeline =
   | 'ASAP'

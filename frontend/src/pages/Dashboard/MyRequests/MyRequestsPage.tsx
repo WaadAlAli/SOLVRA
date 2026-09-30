@@ -19,12 +19,7 @@ import {
 } from '../../../services/request.service'
 
 type FilterStatus =
-  | 'ALL'
-  | 'DRAFT'
-  | 'OPEN'
-  | 'EVALUATING'
-  | 'NEGOTIATING'
-  | 'AWARDED'
+  'ALL' | 'DRAFT' | 'OPEN' | 'EVALUATING' | 'NEGOTIATING' | 'AWARDED'
 
 function formatStatus(status: string) {
   return status.replace(/_/g, ' ')
@@ -78,17 +73,13 @@ function MyRequestsPage() {
       const response = await getMyRequests()
 
       if (!response.success) {
-        throw new Error(
-          'Unable to load your requests.',
-        )
+        throw new Error('Unable to load your requests.')
       }
 
       setRequests(response.requests)
     } catch (err) {
       setError(
-        err instanceof Error
-          ? err.message
-          : 'Unable to load your requests.',
+        err instanceof Error ? err.message : 'Unable to load your requests.',
       )
     } finally {
       setLoading(false)
@@ -103,24 +94,19 @@ function MyRequestsPage() {
     const normalizedSearch = search.trim().toLowerCase()
 
     return requests.filter((request) => {
-      const matchesStatus =
-        filter === 'ALL' || request.status === filter
+      const matchesStatus = filter === 'ALL' || request.status === filter
 
       const matchesSearch =
         !normalizedSearch ||
         request.title.toLowerCase().includes(normalizedSearch) ||
         request.location.toLowerCase().includes(normalizedSearch) ||
-        request.propertyType
-          .toLowerCase()
-          .includes(normalizedSearch)
+        request.propertyType.toLowerCase().includes(normalizedSearch)
 
       return matchesStatus && matchesSearch
     })
   }, [requests, filter, search])
 
-  const handleDelete = async (
-    request: SolarRequest,
-  ) => {
+  const handleDelete = async (request: SolarRequest) => {
     const confirmed = window.confirm(
       `Delete "${request.title}"? This action cannot be undone.`,
     )
@@ -135,25 +121,17 @@ function MyRequestsPage() {
 
       await deleteRequest(request.id)
 
-      setRequests((current) =>
-        current.filter(
-          (item) => item.id !== request.id,
-        ),
-      )
+      setRequests((current) => current.filter((item) => item.id !== request.id))
     } catch (err) {
       setActionError(
-        err instanceof Error
-          ? err.message
-          : 'Unable to delete request.',
+        err instanceof Error ? err.message : 'Unable to delete request.',
       )
     } finally {
       setDeletingId(null)
     }
   }
 
-  const handleOpen = async (
-    request: SolarRequest,
-  ) => {
+  const handleOpen = async (request: SolarRequest) => {
     if (request.status !== 'DRAFT') {
       return
     }
@@ -167,9 +145,7 @@ function MyRequestsPage() {
       })
     } catch (err) {
       setActionError(
-        err instanceof Error
-          ? err.message
-          : 'Unable to resume request.',
+        err instanceof Error ? err.message : 'Unable to resume request.',
       )
     } finally {
       setOpeningId(null)
@@ -215,9 +191,7 @@ function MyRequestsPage() {
 
               <input
                 value={search}
-                onChange={(event) =>
-                  setSearch(event.target.value)
-                }
+                onChange={(event) => setSearch(event.target.value)}
                 placeholder="Search requests..."
                 className="h-10 w-full rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] pl-9 pr-3 text-sm outline-none transition placeholder:text-[var(--text-muted)] focus:border-[var(--copper)]/50"
               />
@@ -244,9 +218,7 @@ function MyRequestsPage() {
                       : 'text-[var(--text-muted)] hover:bg-[var(--text-primary)]/[0.04] hover:text-[var(--text-primary)]'
                   }`}
                 >
-                  {status === 'ALL'
-                    ? 'All'
-                    : formatStatus(status)}
+                  {status === 'ALL' ? 'All' : formatStatus(status)}
                 </button>
               ))}
             </div>
@@ -275,9 +247,7 @@ function MyRequestsPage() {
               Unable to load requests
             </p>
 
-            <p className="mt-2 text-sm text-[var(--text-secondary)]">
-              {error}
-            </p>
+            <p className="mt-2 text-sm text-[var(--text-secondary)]">{error}</p>
 
             <button
               type="button"
@@ -294,9 +264,7 @@ function MyRequestsPage() {
             <div className="mb-3 flex items-center justify-between">
               <p className="text-xs text-[var(--text-muted)]">
                 {filteredRequests.length}{' '}
-                {filteredRequests.length === 1
-                  ? 'request'
-                  : 'requests'}
+                {filteredRequests.length === 1 ? 'request' : 'requests'}
               </p>
             </div>
 
@@ -360,9 +328,7 @@ function MyRequestsPage() {
 
                           <span className="flex items-center gap-1.5">
                             <Zap size={12} />
-                            {formatStatus(
-                              request.propertyType,
-                            )}
+                            {formatStatus(request.propertyType)}
                           </span>
 
                           <span className="flex items-center gap-1.5">
@@ -385,25 +351,19 @@ function MyRequestsPage() {
 
                             <button
                               type="button"
-                              onClick={() =>
-                                void handleOpen(request)
-                              }
-                              disabled={
-                                openingId === request.id
-                              }
+                              onClick={() => void handleOpen(request)}
+                              disabled={openingId === request.id}
                               className="rounded-lg bg-[var(--copper)] px-3 py-2 text-[10px] font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
                             >
-                              {openingId === request.id ? 'Opening...' : 'Review & Open'}
+                              {openingId === request.id
+                                ? 'Opening...'
+                                : 'Review & Open'}
                             </button>
 
                             <button
                               type="button"
-                              onClick={() =>
-                                void handleDelete(request)
-                              }
-                              disabled={
-                                deletingId === request.id
-                              }
+                              onClick={() => void handleDelete(request)}
+                              disabled={deletingId === request.id}
                               className="flex h-8 w-8 items-center justify-center rounded-lg border border-red-500/15 text-red-500 transition hover:bg-red-500/5 disabled:opacity-50"
                               aria-label="Delete request"
                             >

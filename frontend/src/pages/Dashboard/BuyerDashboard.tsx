@@ -21,12 +21,9 @@ import { getUserDisplayName } from '../../utils/userDisplayName'
 function BuyerDashboard() {
   const { user } = useAuth()
 
-  const [stats, setStats] =
-    useState<BuyerDashboardStats | null>(null)
+  const [stats, setStats] = useState<BuyerDashboardStats | null>(null)
 
-  const [requests, setRequests] = useState<
-    BuyerDashboardRequest[]
-  >([])
+  const [requests, setRequests] = useState<BuyerDashboardRequest[]>([])
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -39,17 +36,13 @@ function BuyerDashboard() {
         setLoading(true)
         setError('')
 
-        const response =
-          await getBuyerDashboard()
+        const response = await getBuyerDashboard()
 
         setStats(response.stats)
-        setRequests(
-          response.recentRequests ?? [],
-        )
+        setRequests(response.recentRequests ?? [])
       } catch (err: any) {
         setError(
-          err?.response?.data?.message ||
-            'Unable to load your dashboard.',
+          err?.response?.data?.message || 'Unable to load your dashboard.',
         )
       } finally {
         setLoading(false)
@@ -68,20 +61,15 @@ function BuyerDashboard() {
     return status
       .replaceAll('_', ' ')
       .toLowerCase()
-      .replace(/\b\w/g, (letter) =>
-        letter.toUpperCase(),
-      )
+      .replace(/\b\w/g, (letter) => letter.toUpperCase())
   }
 
   const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString(
-      undefined,
-      {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      },
-    )
+    return new Date(date).toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    })
   }
 
   return (
@@ -99,8 +87,8 @@ function BuyerDashboard() {
             </h1>
 
             <p className="mt-2 max-w-xl text-sm leading-6 text-[var(--text-secondary)]">
-              Manage your solar procurement, evaluate supplier
-              proposals, and make decisions with clarity.
+              Manage your solar procurement, evaluate supplier proposals, and
+              make decisions with clarity.
             </p>
           </div>
 
@@ -109,7 +97,6 @@ function BuyerDashboard() {
             className="group inline-flex h-11 items-center justify-center gap-3 rounded-xl bg-[var(--copper)] px-5 text-sm font-semibold text-white transition hover:bg-[var(--copper-hover)]"
           >
             Create solar request
-
             <ArrowRight
               size={16}
               className="transition-transform group-hover:translate-x-1"
@@ -129,11 +116,7 @@ function BuyerDashboard() {
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           label="Active requests"
-          value={
-            loading
-              ? '—'
-              : String(activeRequests)
-          }
+          value={loading ? '—' : String(activeRequests)}
           description={
             activeRequests === 0
               ? 'No active procurement requests'
@@ -144,24 +127,14 @@ function BuyerDashboard() {
 
         <StatCard
           label="Open requests"
-          value={
-            loading
-              ? '—'
-              : String(stats?.openRequests ?? 0)
-          }
+          value={loading ? '—' : String(stats?.openRequests ?? 0)}
           description="Available for supplier bidding"
           icon={FileSearch}
         />
 
         <StatCard
           label="In negotiation"
-          value={
-            loading
-              ? '—'
-              : String(
-                  stats?.negotiatingRequests ?? 0,
-                )
-          }
+          value={loading ? '—' : String(stats?.negotiatingRequests ?? 0)}
           description="Requests currently in negotiation"
           icon={ArrowRight}
         />
@@ -181,9 +154,7 @@ function BuyerDashboard() {
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)]">
           <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-4">
             <div>
-              <p className="text-sm font-semibold">
-                Your solar requests
-              </p>
+              <p className="text-sm font-semibold">Your solar requests</p>
 
               <p className="mt-1 text-xs text-[var(--text-muted)]">
                 Track the procurement lifecycle from request to award.
@@ -223,9 +194,9 @@ function BuyerDashboard() {
                 </h2>
 
                 <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-                  Tell SOLVRA what you need in plain language.
-                  We'll help structure the requirements before
-                  suppliers submit their proposals.
+                  Tell SOLVRA what you need in plain language. We'll help
+                  structure the requirements before suppliers submit their
+                  proposals.
                 </p>
 
                 <Link
@@ -253,25 +224,19 @@ function BuyerDashboard() {
                         </h3>
 
                         <span className="shrink-0 rounded-full border border-[var(--border)] px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)]">
-                          {formatStatus(
-                            request.status,
-                          )}
+                          {formatStatus(request.status)}
                         </span>
                       </div>
 
                       <p className="mt-2 text-xs text-[var(--text-muted)]">
                         {request.location} ·{' '}
-                        {formatStatus(
-                          request.propertyType,
-                        )}
+                        {formatStatus(request.propertyType)}
                       </p>
                     </div>
 
                     <div className="flex shrink-0 items-center gap-3">
                       <span className="text-[10px] text-[var(--text-muted)]">
-                        {formatDate(
-                          request.createdAt,
-                        )}
+                        {formatDate(request.createdAt)}
                       </span>
 
                       <ArrowRight
@@ -290,14 +255,9 @@ function BuyerDashboard() {
         <div className="rounded-2xl border border-[#00E5FF]/15 bg-[var(--bg-secondary)]">
           <div className="border-b border-[#00E5FF]/10 px-5 py-4">
             <div className="flex items-center gap-2">
-              <Sparkles
-                size={15}
-                className="text-[#00E5FF]"
-              />
+              <Sparkles size={15} className="text-[#00E5FF]" />
 
-              <p className="text-sm font-semibold">
-                AI intelligence
-              </p>
+              <p className="text-sm font-semibold">AI intelligence</p>
             </div>
 
             <p className="mt-1 text-xs text-[var(--text-muted)]">
@@ -316,9 +276,8 @@ function BuyerDashboard() {
               </p>
 
               <p className="mt-2 text-xs leading-5 text-[var(--text-secondary)]">
-                SOLVRA can interpret requirements, identify
-                missing information, normalize supplier
-                proposals, and surface relevant insights.
+                SOLVRA can interpret requirements, identify missing information,
+                normalize supplier proposals, and surface relevant insights.
               </p>
             </div>
 
@@ -334,9 +293,7 @@ function BuyerDashboard() {
       <section className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] p-5">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-semibold">
-              Procurement lifecycle
-            </p>
+            <p className="text-sm font-semibold">Procurement lifecycle</p>
 
             <p className="mt-1 text-xs text-[var(--text-muted)]">
               SOLVRA keeps the decision process structured and auditable.
@@ -359,18 +316,13 @@ function BuyerDashboard() {
             'Negotiate',
             'Award',
           ].map((step, index) => (
-            <div
-              key={step}
-              className="relative"
-            >
+            <div key={step} className="relative">
               <div className="rounded-xl border border-[var(--border)] px-3 py-3">
                 <p className="text-[8px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">
                   0{index + 1}
                 </p>
 
-                <p className="mt-2 text-xs font-medium">
-                  {step}
-                </p>
+                <p className="mt-2 text-xs font-medium">{step}</p>
               </div>
             </div>
           ))}

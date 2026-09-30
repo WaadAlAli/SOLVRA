@@ -36,9 +36,7 @@ export interface BuyerDashboardResponse {
 }
 
 export async function getBuyerDashboard(): Promise<BuyerDashboardResponse> {
-  const response = await api.get<BuyerDashboardResponse>(
-    '/buyer/dashboard',
-  )
+  const response = await api.get<BuyerDashboardResponse>('/buyer/dashboard')
 
   return response.data
 }
@@ -72,9 +70,7 @@ export interface UpdateBuyerProfileInput {
 }
 
 export async function getBuyerProfile(): Promise<BuyerProfileResponse> {
-  const response = await api.get<BuyerProfileResponse>(
-    '/buyer/profile',
-  )
+  const response = await api.get<BuyerProfileResponse>('/buyer/profile')
 
   return response.data
 }

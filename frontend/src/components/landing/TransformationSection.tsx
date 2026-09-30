@@ -11,8 +11,10 @@ import {
 const transformations = [
   {
     icon: FileText,
-    before: 'Requirements scattered across conversations, notes, and documents.',
-    after: 'One structured procurement requirement that suppliers can respond to.',
+    before:
+      'Requirements scattered across conversations, notes, and documents.',
+    after:
+      'One structured procurement requirement that suppliers can respond to.',
   },
   {
     icon: Search,
@@ -21,12 +23,14 @@ const transformations = [
   },
   {
     icon: GitCompare,
-    before: 'Comparing PDFs, spreadsheets, warranties, and assumptions manually.',
+    before:
+      'Comparing PDFs, spreadsheets, warranties, and assumptions manually.',
     after: 'Relevant differences appear together in one comparison view.',
   },
   {
     icon: Scale,
-    before: 'Decisions can become dominated by whichever number is easiest to see.',
+    before:
+      'Decisions can become dominated by whichever number is easiest to see.',
     after: 'Your criteria and weighting determine how proposals are evaluated.',
   },
   {
@@ -55,16 +59,16 @@ function TransformationSection() {
         <div className="grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-24">
           <div>
             <div className="flex items-center gap-3">
-          <span className="text-[10px] font-bold tracking-[0.18em] text-[var(--text-muted)]">
-           03
-        </span>
+              <span className="text-[10px] font-bold tracking-[0.18em] text-[var(--text-muted)]">
+                03
+              </span>
 
-        <span className="h-px w-8 bg-[var(--border)]" />
+              <span className="h-px w-8 bg-[var(--border)]" />
 
-         <p className="text-xs font-bold tracking-[0.18em] text-[#D47A3A]">
-         PROCUREMENT, REFRAMED
-           </p>
-         </div>
+              <p className="text-xs font-bold tracking-[0.18em] text-[#D47A3A]">
+                PROCUREMENT, REFRAMED
+              </p>
+            </div>
 
             <div className="mt-5 h-px w-16 bg-[#D47A3A]" />
           </div>

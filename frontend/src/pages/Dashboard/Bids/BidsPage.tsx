@@ -9,7 +9,10 @@ import { Link } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 
 import DashboardShell from '../../../components/dashboard/DashboardShell'
-import { getMyRequests, type SolarRequest } from '../../../services/request.service'
+import {
+  getMyRequests,
+  type SolarRequest,
+} from '../../../services/request.service'
 import { getRequestBids, type RequestBid } from '../../../services/bid.service'
 
 function formatDate(date: string) {
@@ -90,9 +93,7 @@ function BidsPage() {
         setRequestStatus(response.request.status)
         setRequestLocation(response.request.location)
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : 'Unable to load bids.',
-        )
+        setError(err instanceof Error ? err.message : 'Unable to load bids.')
       } finally {
         setLoading(false)
       }
@@ -112,9 +113,7 @@ function BidsPage() {
               Procurement
             </p>
 
-            <h1 className="mt-2 text-3xl font-bold tracking-[-0.03em]">
-              Bids
-            </h1>
+            <h1 className="mt-2 text-3xl font-bold tracking-[-0.03em]">Bids</h1>
           </div>
         </div>
 
@@ -130,7 +129,9 @@ function BidsPage() {
 
         {!loading && error && (
           <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-6">
-            <p className="text-sm font-semibold text-red-500">Unable to load bids</p>
+            <p className="text-sm font-semibold text-red-500">
+              Unable to load bids
+            </p>
             <p className="mt-2 text-sm text-[var(--text-secondary)]">{error}</p>
           </div>
         )}
@@ -147,7 +148,9 @@ function BidsPage() {
                   {requests.length > 0 ? (
                     <select
                       value={selectedRequestId}
-                      onChange={(event) => setSelectedRequestId(event.target.value)}
+                      onChange={(event) =>
+                        setSelectedRequestId(event.target.value)
+                      }
                       className="mt-3 h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] px-3 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--copper)]/50 md:max-w-md"
                     >
                       {requests.map((request) => (
@@ -199,7 +202,8 @@ function BidsPage() {
 
                 <h3 className="mt-5 text-lg font-semibold">No bids yet</h3>
                 <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                  Supplier proposals will appear here once bids are submitted for this request.
+                  Supplier proposals will appear here once bids are submitted
+                  for this request.
                 </p>
               </div>
             ) : (
@@ -215,7 +219,10 @@ function BidsPage() {
                       <div className="flex items-start justify-between gap-4">
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
-                            <Building2 size={15} className="text-[var(--copper)]" />
+                            <Building2
+                              size={15}
+                              className="text-[var(--copper)]"
+                            />
                             <h3 className="text-lg font-semibold tracking-[-0.02em]">
                               {bid.supplier.companyName}
                             </h3>
@@ -250,7 +257,9 @@ function BidsPage() {
                             Price
                           </p>
                           <p className="mt-2 text-lg font-semibold tracking-[-0.02em]">
-                            {latestVersion ? formatCurrency(latestVersion.totalPrice) : 'Not specified'}
+                            {latestVersion
+                              ? formatCurrency(latestVersion.totalPrice)
+                              : 'Not specified'}
                           </p>
                         </div>
 
@@ -259,7 +268,9 @@ function BidsPage() {
                             Capacity
                           </p>
                           <p className="mt-2 text-lg font-semibold tracking-[-0.02em]">
-                            {latestVersion ? `${formatCurrency(latestVersion.panelCapacityKw)} kW` : 'Not specified'}
+                            {latestVersion
+                              ? `${formatCurrency(latestVersion.panelCapacityKw)} kW`
+                              : 'Not specified'}
                           </p>
                         </div>
                       </div>
@@ -268,21 +279,27 @@ function BidsPage() {
                         <div className="flex items-center justify-between gap-2 border-b border-[var(--border)] pb-2">
                           <span>Service area</span>
                           <span className="text-[var(--text-primary)]">
-                            {bid.supplier.serviceAreas.length > 0 ? bid.supplier.serviceAreas.join(', ') : 'Not specified'}
+                            {bid.supplier.serviceAreas.length > 0
+                              ? bid.supplier.serviceAreas.join(', ')
+                              : 'Not specified'}
                           </span>
                         </div>
 
                         <div className="flex items-center justify-between gap-2 border-b border-[var(--border)] pb-2">
                           <span>Battery</span>
                           <span className="text-[var(--text-primary)]">
-                            {latestVersion?.batteryCapacityKwh ? `${formatCurrency(latestVersion.batteryCapacityKwh)} kWh` : 'Not specified'}
+                            {latestVersion?.batteryCapacityKwh
+                              ? `${formatCurrency(latestVersion.batteryCapacityKwh)} kWh`
+                              : 'Not specified'}
                           </span>
                         </div>
 
                         <div className="flex items-center justify-between gap-2 border-b border-[var(--border)] pb-2">
                           <span>Warranty</span>
                           <span className="text-[var(--text-primary)]">
-                            {latestVersion?.warrantyYears ? `${latestVersion.warrantyYears} years` : 'Not specified'}
+                            {latestVersion?.warrantyYears
+                              ? `${latestVersion.warrantyYears} years`
+                              : 'Not specified'}
                           </span>
                         </div>
 

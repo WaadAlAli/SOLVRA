@@ -2,9 +2,7 @@ import type { Response } from 'express'
 
 import type { AuthenticatedRequest } from '../middleware/auth.middleware.js'
 import { prisma } from '../config/prisma.js'
-import {
-  updateBuyerProfileSchema,
-} from '../validators/buyerProfile.validator.js'
+import { updateBuyerProfileSchema } from '../validators/buyerProfile.validator.js'
 
 export async function getBuyerProfile(
   req: AuthenticatedRequest,
@@ -72,8 +70,7 @@ export async function updateBuyerProfile(
       })
     }
 
-    const validation =
-      updateBuyerProfileSchema.safeParse(req.body)
+    const validation = updateBuyerProfileSchema.safeParse(req.body)
 
     if (!validation.success) {
       return res.status(400).json({
@@ -96,24 +93,23 @@ export async function updateBuyerProfile(
 
     const data = validation.data
 
-    const updatedProfile =
-      await prisma.buyerProfile.update({
-        where: {
-          userId,
-        },
-        data,
-        include: {
-          user: {
-            select: {
-              id: true,
-              email: true,
-              role: true,
-              isActive: true,
-              createdAt: true,
-            },
+    const updatedProfile = await prisma.buyerProfile.update({
+      where: {
+        userId,
+      },
+      data,
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+            isActive: true,
+            createdAt: true,
           },
         },
-      })
+      },
+    })
 
     return res.status(200).json({
       success: true,

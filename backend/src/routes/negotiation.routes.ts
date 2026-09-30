@@ -28,6 +28,3 @@ router.get('/:id', getNegotiationById)
 router.post('/:id/messages', createNegotiationMessage)
 
 export default router
-
-
-

@@ -1,8 +1,4 @@
-import {
-  Bell,
-  Menu,
-  Search,
-} from 'lucide-react'
+import { Bell, Menu, Search } from 'lucide-react'
 
 import ThemeToggle from '../ui/ThemeToggle'
 
@@ -10,9 +6,7 @@ interface DashboardHeaderProps {
   role: 'BUYER' | 'SUPPLIER' | 'ADMIN'
 }
 
-function DashboardHeader({
-  role,
-}: DashboardHeaderProps) {
+function DashboardHeader({ role }: DashboardHeaderProps) {
   const roleLabel =
     role === 'BUYER'
       ? 'Buyer workspace'
@@ -51,9 +45,7 @@ function DashboardHeader({
           >
             <Search size={14} />
             <span>Search</span>
-            <kbd className="ml-3 text-[9px]">
-              ⌘ K
-            </kbd>
+            <kbd className="ml-3 text-[9px]">⌘ K</kbd>
           </button>
 
           <button

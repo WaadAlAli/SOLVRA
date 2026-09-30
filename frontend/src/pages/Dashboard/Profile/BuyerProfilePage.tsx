@@ -1,10 +1,4 @@
-import {
-  Check,
-  Mail,
-  MapPin,
-  Phone,
-  UserRound,
-} from 'lucide-react'
+import { Check, Mail, MapPin, Phone, UserRound } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import DashboardShell from '../../../components/dashboard/DashboardShell'
@@ -35,9 +29,7 @@ function BuyerProfilePage() {
         const response = await getBuyerProfile()
 
         if (!response.success) {
-          throw new Error(
-            response.message || 'Unable to load profile.',
-          )
+          throw new Error(response.message || 'Unable to load profile.')
         }
 
         const data = response.profile
@@ -48,11 +40,7 @@ function BuyerProfilePage() {
         setLocation(data.location || '')
         setPhone(data.phone || '')
       } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : 'Unable to load profile.',
-        )
+        setError(err instanceof Error ? err.message : 'Unable to load profile.')
       } finally {
         setLoading(false)
       }
@@ -61,9 +49,7 @@ function BuyerProfilePage() {
     void loadProfile()
   }, [])
 
-  const handleSubmit = async (
-    event: React.FormEvent<HTMLFormElement>,
-  ) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     try {
@@ -79,20 +65,14 @@ function BuyerProfilePage() {
       })
 
       if (!response.success) {
-        throw new Error(
-          response.message || 'Unable to update profile.',
-        )
+        throw new Error(response.message || 'Unable to update profile.')
       }
 
       setProfile(response.profile)
       await refreshUser()
       setMessage('Profile updated successfully.')
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Unable to update profile.',
-      )
+      setError(err instanceof Error ? err.message : 'Unable to update profile.')
     } finally {
       setSaving(false)
     }
@@ -126,10 +106,7 @@ function BuyerProfilePage() {
             </div>
           </div>
         ) : (
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-5"
-          >
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Identity */}
             <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] p-6">
               <div className="flex items-center gap-3">
@@ -189,9 +166,7 @@ function BuyerProfilePage() {
                 </div>
 
                 <div>
-                  <p className="text-sm font-semibold">
-                    Email address
-                  </p>
+                  <p className="text-sm font-semibold">Email address</p>
 
                   <p className="mt-0.5 text-xs text-[var(--text-muted)]">
                     Your login email address.

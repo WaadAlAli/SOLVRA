@@ -30,7 +30,9 @@ function SupplierProfilePage() {
         const response = await getSupplierProfile()
 
         if (!response.success || !response.profile) {
-          throw new Error(response.message || 'Unable to load supplier profile.')
+          throw new Error(
+            response.message || 'Unable to load supplier profile.',
+          )
         }
 
         const data = response.profile
@@ -75,7 +77,9 @@ function SupplierProfilePage() {
       })
 
       if (!response.success || !response.profile) {
-        throw new Error(response.message || 'Unable to update supplier profile.')
+        throw new Error(
+          response.message || 'Unable to update supplier profile.',
+        )
       }
 
       setProfile(response.profile)
@@ -87,7 +91,9 @@ function SupplierProfilePage() {
       setMessage('Supplier profile updated successfully.')
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : 'Unable to update supplier profile.',
+        err instanceof Error
+          ? err.message
+          : 'Unable to update supplier profile.',
       )
     } finally {
       setSaving(false)
@@ -107,7 +113,8 @@ function SupplierProfilePage() {
             Supplier profile
           </h1>
           <p className="mt-2 text-sm text-[var(--text-secondary)]">
-            Manage the company identity and service information used across the supplier workspace.
+            Manage the company identity and service information used across the
+            supplier workspace.
           </p>
         </div>
 
@@ -198,7 +205,9 @@ function SupplierProfilePage() {
 
               <div className="mt-5 flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] px-4 py-3 text-sm text-[var(--text-secondary)]">
                 <MapPin size={14} className="text-[var(--copper)]" />
-                {profile?.verifiedByAdmin ? 'Verified supplier account' : 'Pending verification'}
+                {profile?.verifiedByAdmin
+                  ? 'Verified supplier account'
+                  : 'Pending verification'}
               </div>
             </section>
 

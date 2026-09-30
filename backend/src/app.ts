@@ -16,12 +16,20 @@ import evaluationRoutes from './routes/evaluation.routes.js'
 import awardRoutes from './routes/award.routes.js'
 
 const app = express()
+const isProduction = process.env.NODE_ENV === 'production'
+const frontendUrl =
+  process.env.FRONTEND_URL?.trim() ||
+  (isProduction ? undefined : 'http://localhost:5173')
+
+if (!frontendUrl) {
+  throw new Error('FRONTEND_URL is required in production')
+}
 
 app.use(helmet())
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL ?? 'http://localhost:5173',
+    origin: frontendUrl,
     credentials: true,
   }),
 )

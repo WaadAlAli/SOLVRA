@@ -1,9 +1,4 @@
-import {
-  Bell,
-  LockKeyhole,
-  ShieldCheck,
-  UserRound,
-} from 'lucide-react'
+import { Bell, LockKeyhole, ShieldCheck, UserRound } from 'lucide-react'
 
 import DashboardShell from '../../../components/dashboard/DashboardShell'
 
@@ -78,9 +73,7 @@ function SettingsCard({
         </div>
 
         <div>
-          <h2 className="text-sm font-semibold">
-            {title}
-          </h2>
+          <h2 className="text-sm font-semibold">{title}</h2>
 
           <p className="mt-1 max-w-xl text-xs leading-5 text-[var(--text-muted)]">
             {description}

@@ -15,15 +15,15 @@ import { authRateLimiter } from '../middleware/rate-limit.middleware.js'
 
 const router = Router()
 
-router.post('/register',authRateLimiter, register)
-router.post('/login',authRateLimiter, login)
+router.post('/register', authRateLimiter, register)
+router.post('/login', authRateLimiter, login)
 
 router.get('/me', authenticate, me)
 
 router.post('/logout', logout)
-router.post( '/forgot-password', authRateLimiter, forgotPassword,)
+router.post('/forgot-password', authRateLimiter, forgotPassword)
 
-router.post( '/reset-password',authRateLimiter,resetPasswordHandler,)
+router.post('/reset-password', authRateLimiter, resetPasswordHandler)
 
 router.get(
   '/buyer-test',

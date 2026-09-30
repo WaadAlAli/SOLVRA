@@ -1,10 +1,4 @@
-import {
-  Bell,
-  LockKeyhole,
-  LogOut,
-  ShieldCheck,
-  UserRound,
-} from 'lucide-react'
+import { Bell, LockKeyhole, LogOut, ShieldCheck, UserRound } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 
@@ -44,7 +38,8 @@ function SupplierSettingsPage() {
           </h1>
 
           <p className="mt-2 text-sm text-[var(--text-secondary)]">
-            Manage your supplier workspace preferences, security, and account context.
+            Manage your supplier workspace preferences, security, and account
+            context.
           </p>
         </div>
 
@@ -86,7 +81,8 @@ function SupplierSettingsPage() {
               <div>
                 <h2 className="text-sm font-semibold">Sign out</h2>
                 <p className="mt-1 max-w-xl text-xs leading-5 text-[var(--text-muted)]">
-                  End your current supplier session and return to the login screen.
+                  End your current supplier session and return to the login
+                  screen.
                 </p>
               </div>
             </div>
@@ -126,7 +122,9 @@ function SettingsCard({
 
         <div>
           <h2 className="text-sm font-semibold">{title}</h2>
-          <p className="mt-1 max-w-xl text-xs leading-5 text-[var(--text-muted)]">{description}</p>
+          <p className="mt-1 max-w-xl text-xs leading-5 text-[var(--text-muted)]">
+            {description}
+          </p>
         </div>
       </div>
 

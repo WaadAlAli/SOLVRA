@@ -24,9 +24,7 @@ interface DashboardSidebarProps {
   role: 'BUYER' | 'SUPPLIER' | 'ADMIN'
 }
 
-function DashboardSidebar({
-  role,
-}: DashboardSidebarProps) {
+function DashboardSidebar({ role }: DashboardSidebarProps) {
   const roleLabel =
     role === 'BUYER'
       ? 'Buyer'
@@ -40,32 +38,29 @@ function DashboardSidebar({
   const displayName = getUserDisplayName(user)
   const workspaceInitial = displayName.charAt(0).toUpperCase() || 'S'
 
-const handleLogout = async () => {
-  try {
-    setLoggingOut(true)
+  const handleLogout = async () => {
+    try {
+      setLoggingOut(true)
 
-    await logout()
-    clearUser()
+      await logout()
+      clearUser()
 
-    navigate('/login', { replace: true })
-  } catch {
-    // Even if the server request fails,
-    // clear the local authenticated state.
-    clearUser()
-    navigate('/login', { replace: true })
-  } finally {
-    setLoggingOut(false)
+      navigate('/login', { replace: true })
+    } catch {
+      // Even if the server request fails,
+      // clear the local authenticated state.
+      clearUser()
+      navigate('/login', { replace: true })
+    } finally {
+      setLoggingOut(false)
+    }
   }
-}
 
   return (
     <aside className="fixed inset-y-0 left-0 z-40 hidden w-[250px] border-r border-[var(--border)] bg-[var(--bg-primary)] lg:flex lg:flex-col">
       {/* Brand */}
       <div className="flex h-[76px] items-center border-b border-[var(--border)] px-5">
-        <Link
-          to="/"
-          className="flex items-center gap-3"
-        >
+        <Link to="/" className="flex items-center gap-3">
           <div className="relative flex h-9 w-9 items-center justify-center rounded-full border border-[var(--text-primary)]/15">
             <div className="absolute inset-1 rounded-full border border-[var(--copper)]/40" />
 
@@ -75,9 +70,7 @@ const handleLogout = async () => {
           </div>
 
           <div>
-            <p className="text-sm font-semibold tracking-[0.22em]">
-              SOLVRA
-            </p>
+            <p className="text-sm font-semibold tracking-[0.22em]">SOLVRA</p>
 
             <p className="mt-0.5 text-[8px] uppercase tracking-[0.16em] text-[var(--text-muted)]">
               Decision platform
@@ -98,9 +91,7 @@ const handleLogout = async () => {
             </div>
 
             <div className="min-w-0">
-              <p className="truncate text-xs font-semibold">
-                {displayName}
-              </p>
+              <p className="truncate text-xs font-semibold">{displayName}</p>
 
               <p className="mt-0.5 text-[9px] uppercase tracking-[0.12em] text-[var(--text-muted)]">
                 {roleLabel}
@@ -147,12 +138,11 @@ const handleLogout = async () => {
                   label="My Bids"
                   icon={FileText}
                 />
-                  <DashboardNavItem
-                to="/supplier/negotiations"
-                label="Negotiations"
-                icon={Handshake}
+                <DashboardNavItem
+                  to="/supplier/negotiations"
+                  label="Negotiations"
+                  icon={Handshake}
                 />
-
               </div>
             </div>
 
@@ -267,22 +257,20 @@ const handleLogout = async () => {
       {/* Security / footer */}
       <div className="border-t border-[var(--border)] p-4">
         <div className="mb-3 flex items-center gap-2 px-2 text-[9px] uppercase tracking-[0.15em] text-[var(--text-muted)]">
-          <ShieldCheck
-            size={12}
-            className="text-[var(--copper)]"
-          />
+          <ShieldCheck size={12} className="text-[var(--copper)]" />
           Secure workspace
         </div>
 
         <button
-       type="button"
-       onClick={handleLogout}
-       disabled={loggingOut}
-       className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-[var(--text-secondary)] transition hover:bg-red-500/[0.04] hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50">
-      <LogOut size={16} />
+          type="button"
+          onClick={handleLogout}
+          disabled={loggingOut}
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-[var(--text-secondary)] transition hover:bg-red-500/[0.04] hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <LogOut size={16} />
 
-      {loggingOut ? 'Signing out...' : 'Sign out'}
-     </button>
+          {loggingOut ? 'Signing out...' : 'Sign out'}
+        </button>
       </div>
     </aside>
   )

@@ -11,10 +11,7 @@ import {
 } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-import type {
-  RequestStep,
-  SolarRequestForm,
-} from '../../../types/request'
+import type { RequestStep, SolarRequestForm } from '../../../types/request'
 
 import {
   analyzeRequest,
@@ -60,8 +57,7 @@ const initialForm: SolarRequestForm = {
 function getApiErrorMessage(err: any, fallback: string) {
   const data = err?.response?.data
   const fieldErrors = data?.errors?.fieldErrors as
-    | Record<string, string[] | undefined>
-    | undefined
+    Record<string, string[] | undefined> | undefined
 
   if (fieldErrors) {
     const details = Object.entries(fieldErrors)
@@ -80,32 +76,26 @@ function CreateSolarRequestPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const draftRequestId =
-    (location.state as { draftRequestId?: string } | null)?.draftRequestId ?? null
+    (location.state as { draftRequestId?: string } | null)?.draftRequestId ??
+    null
 
-  const [currentStep, setCurrentStep] =
-    useState<RequestStep>('PROJECT')
+  const [currentStep, setCurrentStep] = useState<RequestStep>('PROJECT')
 
-  const [form, setForm] =
-    useState<SolarRequestForm>(initialForm)
+  const [form, setForm] = useState<SolarRequestForm>(initialForm)
 
   const [requestId, setRequestId] = useState<string | null>(null)
 
-  const [analysis, setAnalysis] =
-    useState<AnalyzeRequestResult | null>(null)
+  const [analysis, setAnalysis] = useState<AnalyzeRequestResult | null>(null)
 
-  const [resumingDraftId, setResumingDraftId] =
-    useState<string | null>(null)
+  const [resumingDraftId, setResumingDraftId] = useState<string | null>(null)
 
   const loadedDraftRef = useRef<string | null>(null)
 
-  const [isSubmitting, setIsSubmitting] =
-    useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const [error, setError] = useState('')
 
-  const currentIndex = steps.findIndex(
-    (step) => step.id === currentStep,
-  )
+  const currentIndex = steps.findIndex((step) => step.id === currentStep)
 
   const updateField = <K extends keyof SolarRequestForm>(
     field: K,
@@ -164,9 +154,7 @@ function CreateSolarRequestPage() {
     if (currentIndex < steps.length - 1) {
       setError('')
 
-      setCurrentStep(
-        steps[currentIndex + 1].id,
-      )
+      setCurrentStep(steps[currentIndex + 1].id)
     }
   }
 
@@ -174,9 +162,7 @@ function CreateSolarRequestPage() {
     setError('')
 
     if (currentIndex > 0) {
-      setCurrentStep(
-        steps[currentIndex - 1].id,
-      )
+      setCurrentStep(steps[currentIndex - 1].id)
     } else {
       navigate('/dashboard')
     }
@@ -212,7 +198,8 @@ function CreateSolarRequestPage() {
         setForm({
           projectTitle: request.title,
           projectDescription: request.rawDescription,
-          propertyType: (request.propertyType as SolarRequestForm['propertyType']) ?? '',
+          propertyType:
+            (request.propertyType as SolarRequestForm['propertyType']) ?? '',
           monthlyElectricityBill: request.monthlyElectricityBill
             ? String(request.monthlyElectricityBill)
             : '',
@@ -226,7 +213,8 @@ function CreateSolarRequestPage() {
           budgetMin: '',
           budgetMax: request.budget ? String(request.budget) : '',
           priority: (request.priority as SolarRequestForm['priority']) ?? '',
-          targetTimeline: (request.timeline as SolarRequestForm['targetTimeline']) ?? '',
+          targetTimeline:
+            (request.timeline as SolarRequestForm['targetTimeline']) ?? '',
         })
 
         setCurrentStep('SUBMIT')
@@ -288,46 +276,35 @@ function CreateSolarRequestPage() {
           ''
         >,
         location: form.location.trim(),
-        rawDescription:
-          form.projectDescription.trim(),
+        rawDescription: form.projectDescription.trim(),
 
         currency: form.currency || undefined,
 
-        monthlyElectricityBill:
-          form.monthlyElectricityBill
-            ? Number(form.monthlyElectricityBill)
-            : undefined,
+        monthlyElectricityBill: form.monthlyElectricityBill
+          ? Number(form.monthlyElectricityBill)
+          : undefined,
 
-        averageMonthlyConsumption:
-          form.averageMonthlyConsumption
-            ? Number(
-                form.averageMonthlyConsumption,
-              )
-            : undefined,
+        averageMonthlyConsumption: form.averageMonthlyConsumption
+          ? Number(form.averageMonthlyConsumption)
+          : undefined,
 
         roofType: form.roofType || undefined,
         ownership: form.ownership || undefined,
 
-        budgetMin: form.budgetMin
-          ? Number(form.budgetMin)
-          : undefined,
+        budgetMin: form.budgetMin ? Number(form.budgetMin) : undefined,
 
-        budgetMax: form.budgetMax
-          ? Number(form.budgetMax)
-          : undefined,
+        budgetMax: form.budgetMax ? Number(form.budgetMax) : undefined,
 
         priority: form.priority || undefined,
 
-        timeline:
-          form.targetTimeline || undefined,
+        timeline: form.targetTimeline || undefined,
       })
 
       const createdId = createResponse.request.id
 
       setRequestId(createdId)
 
-      const analysisResponse =
-        await analyzeRequest(createdId)
+      const analysisResponse = await analyzeRequest(createdId)
 
       setAnalysis(analysisResponse.analysis)
     } catch (err: any) {
@@ -366,45 +343,31 @@ function CreateSolarRequestPage() {
       /*
        * Save the buyer-confirmed AI interpretation.
        */
-      await confirmRequirements(
-        requestId,
-        {
-          occupantsOrUsers:
-            analysis.occupantsOrUsers,
+      await confirmRequirements(requestId, {
+        occupantsOrUsers: analysis.occupantsOrUsers,
 
-          acUnitsCount:
-            analysis.acUnitsCount,
+        acUnitsCount: analysis.acUnitsCount,
 
-          applianceLoad:
-            analysis.applianceLoad,
+        applianceLoad: analysis.applianceLoad,
 
-          usagePattern:
-            analysis.usagePattern,
+        usagePattern: analysis.usagePattern,
 
-          backupRequired:
-            analysis.backupRequired,
+        backupRequired: analysis.backupRequired,
 
-          currentElectricitySituation:
-            analysis.currentElectricitySituation,
+        currentElectricitySituation: analysis.currentElectricitySituation,
 
-          goals: analysis.goals.filter(
-            (goal) => goal.trim().length > 0,
-          ),
+        goals: analysis.goals.filter((goal) => goal.trim().length > 0),
 
-          preferences:
-            analysis.preferences,
+        preferences: analysis.preferences,
 
-          extractionConfidence:
-            analysis.extractionConfidence,
+        extractionConfidence: analysis.extractionConfidence,
 
-          missingInformation:
-            analysis.missingInformation,
+        missingInformation: analysis.missingInformation,
 
-          conflicts: analysis.conflicts,
+        conflicts: analysis.conflicts,
 
-          confirmedByBuyer: true,
-        },
-      )
+        confirmedByBuyer: true,
+      })
 
       /*
        * Open the same existing request for suppliers.
@@ -475,8 +438,8 @@ function CreateSolarRequestPage() {
           </h1>
 
           <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)] sm:text-base">
-            Build a structured solar request that suppliers can
-            understand and bid on.
+            Build a structured solar request that suppliers can understand and
+            bid on.
           </p>
         </div>
 
@@ -488,16 +451,11 @@ function CreateSolarRequestPage() {
               const isCompleted = index < currentIndex
 
               return (
-                <div
-                  key={step.id}
-                  className="flex flex-1 items-center"
-                >
+                <div key={step.id} className="flex flex-1 items-center">
                   <button
                     type="button"
                     disabled={index > currentIndex}
-                    onClick={() =>
-                      setCurrentStep(step.id)
-                    }
+                    onClick={() => setCurrentStep(step.id)}
                     className="flex items-center gap-3 text-left"
                   >
                     <div
@@ -510,11 +468,7 @@ function CreateSolarRequestPage() {
                             : 'border-[var(--border)] text-[var(--text-muted)]',
                       ].join(' ')}
                     >
-                      {isCompleted ? (
-                        <Check size={15} />
-                      ) : (
-                        step.number
-                      )}
+                      {isCompleted ? <Check size={15} /> : step.number}
                     </div>
 
                     <span
@@ -541,10 +495,7 @@ function CreateSolarRequestPage() {
         {/* Error */}
         {error && (
           <div className="mb-5 flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/[0.05] p-4">
-            <AlertCircle
-              size={17}
-              className="mt-0.5 shrink-0 text-red-500"
-            />
+            <AlertCircle size={17} className="mt-0.5 shrink-0 text-red-500" />
 
             <p className="text-sm leading-5 text-[var(--text-secondary)]">
               {error}
@@ -554,36 +505,22 @@ function CreateSolarRequestPage() {
 
         <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] p-6 shadow-sm sm:p-8">
           {currentStep === 'PROJECT' && (
-            <ProjectStep
-              form={form}
-              updateField={updateField}
-            />
+            <ProjectStep form={form} updateField={updateField} />
           )}
 
           {currentStep === 'ENERGY' && (
-            <EnergyStep
-              form={form}
-              updateField={updateField}
-            />
+            <EnergyStep form={form} updateField={updateField} />
           )}
 
           {currentStep === 'SITE' && (
-            <SiteStep
-              form={form}
-              updateField={updateField}
-            />
+            <SiteStep form={form} updateField={updateField} />
           )}
 
           {currentStep === 'PREFERENCES' && (
-            <PreferencesStep
-              form={form}
-              updateField={updateField}
-            />
+            <PreferencesStep form={form} updateField={updateField} />
           )}
 
-          {currentStep === 'REVIEW' && (
-            <ReviewStep form={form} />
-          )}
+          {currentStep === 'REVIEW' && <ReviewStep form={form} />}
 
           {currentStep === 'SUBMIT' && (
             <SubmitStep
@@ -653,9 +590,7 @@ function StepHeader({
         Step {number}
       </p>
 
-      <h2 className="mt-2 text-2xl font-semibold">
-        {title}
-      </h2>
+      <h2 className="mt-2 text-2xl font-semibold">{title}</h2>
 
       <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
         {description}
@@ -714,9 +649,7 @@ function OptionCard({
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-medium">
-            {title}
-          </p>
+          <p className="text-sm font-medium">{title}</p>
 
           {description && (
             <p className="mt-1 text-xs leading-5 text-[var(--text-muted)]">
@@ -742,10 +675,7 @@ function OptionCard({
 /* Step 01                                                                    */
 /* -------------------------------------------------------------------------- */
 
-function ProjectStep({
-  form,
-  updateField,
-}: StepProps) {
+function ProjectStep({ form, updateField }: StepProps) {
   return (
     <div className="max-w-3xl">
       <StepHeader
@@ -761,12 +691,7 @@ function ProjectStep({
           <input
             type="text"
             value={form.projectTitle}
-            onChange={(e) =>
-              updateField(
-                'projectTitle',
-                e.target.value,
-              )
-            }
+            onChange={(e) => updateField('projectTitle', e.target.value)}
             placeholder="e.g. Home Solar System"
             className={inputClass}
           />
@@ -774,9 +699,7 @@ function ProjectStep({
 
         <div>
           <div className="mb-2 flex items-center justify-between">
-            <FieldLabel>
-              Tell us about your project
-            </FieldLabel>
+            <FieldLabel>Tell us about your project</FieldLabel>
 
             <span className="text-xs text-[var(--text-muted)]">
               Natural language is fine
@@ -786,12 +709,7 @@ function ProjectStep({
           <textarea
             rows={7}
             value={form.projectDescription}
-            onChange={(e) =>
-              updateField(
-                'projectDescription',
-                e.target.value,
-              )
-            }
+            onChange={(e) => updateField('projectDescription', e.target.value)}
             placeholder="For example: I need solar for my house in Tyre. My electricity bill is around $150 per month. I want something reliable and good quality, but I don't necessarily want the cheapest option."
             className={`${inputClass} resize-none leading-6`}
           />
@@ -807,10 +725,7 @@ function ProjectStep({
 /* Step 02                                                                    */
 /* -------------------------------------------------------------------------- */
 
-function EnergyStep({
-  form,
-  updateField,
-}: StepProps) {
+function EnergyStep({ form, updateField }: StepProps) {
   return (
     <div className="max-w-4xl">
       <StepHeader
@@ -825,54 +740,31 @@ function EnergyStep({
 
           <div className="grid gap-3 sm:grid-cols-3">
             <OptionCard
-              selected={
-                form.propertyType === 'RESIDENTIAL'
-              }
+              selected={form.propertyType === 'RESIDENTIAL'}
               title="Residential"
               description="House, apartment, villa or similar."
-              onClick={() =>
-                updateField(
-                  'propertyType',
-                  'RESIDENTIAL',
-                )
-              }
+              onClick={() => updateField('propertyType', 'RESIDENTIAL')}
             />
 
             <OptionCard
-              selected={
-                form.propertyType === 'COMMERCIAL'
-              }
+              selected={form.propertyType === 'COMMERCIAL'}
               title="Commercial"
               description="Shop, office, warehouse or business."
-              onClick={() =>
-                updateField(
-                  'propertyType',
-                  'COMMERCIAL',
-                )
-              }
+              onClick={() => updateField('propertyType', 'COMMERCIAL')}
             />
 
             <OptionCard
-              selected={
-                form.propertyType === 'INSTITUTIONAL'
-              }
+              selected={form.propertyType === 'INSTITUTIONAL'}
               title="Institutional"
               description="School, NGO, facility or organization."
-              onClick={() =>
-                updateField(
-                  'propertyType',
-                  'INSTITUTIONAL',
-                )
-              }
+              onClick={() => updateField('propertyType', 'INSTITUTIONAL')}
             />
           </div>
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
-            <FieldLabel>
-              Average monthly electricity bill
-            </FieldLabel>
+            <FieldLabel>Average monthly electricity bill</FieldLabel>
 
             <div className="flex gap-2">
               <select
@@ -894,10 +786,7 @@ function EnergyStep({
                 min="0"
                 value={form.monthlyElectricityBill}
                 onChange={(e) =>
-                  updateField(
-                    'monthlyElectricityBill',
-                    e.target.value,
-                  )
+                  updateField('monthlyElectricityBill', e.target.value)
                 }
                 placeholder="150"
                 className={inputClass}
@@ -906,22 +795,15 @@ function EnergyStep({
           </div>
 
           <div>
-            <FieldLabel optional>
-              Average monthly consumption
-            </FieldLabel>
+            <FieldLabel optional>Average monthly consumption</FieldLabel>
 
             <div className="relative">
               <input
                 type="number"
                 min="0"
-                value={
-                  form.averageMonthlyConsumption
-                }
+                value={form.averageMonthlyConsumption}
                 onChange={(e) =>
-                  updateField(
-                    'averageMonthlyConsumption',
-                    e.target.value,
-                  )
+                  updateField('averageMonthlyConsumption', e.target.value)
                 }
                 placeholder="e.g. 500"
                 className={`${inputClass} pr-16`}
@@ -944,10 +826,7 @@ function EnergyStep({
 /* Step 03                                                                    */
 /* -------------------------------------------------------------------------- */
 
-function SiteStep({
-  form,
-  updateField,
-}: StepProps) {
+function SiteStep({ form, updateField }: StepProps) {
   return (
     <div className="max-w-4xl">
       <StepHeader
@@ -963,12 +842,7 @@ function SiteStep({
           <input
             type="text"
             value={form.location}
-            onChange={(e) =>
-              updateField(
-                'location',
-                e.target.value,
-              )
-            }
+            onChange={(e) => updateField('location', e.target.value)}
             placeholder="e.g. Tyre, South Lebanon"
             className={inputClass}
           />
@@ -985,99 +859,50 @@ function SiteStep({
             <OptionCard
               selected={form.roofType === 'FLAT'}
               title="Flat roof"
-              onClick={() =>
-                updateField(
-                  'roofType',
-                  'FLAT',
-                )
-              }
+              onClick={() => updateField('roofType', 'FLAT')}
             />
 
             <OptionCard
-              selected={
-                form.roofType === 'SLOPED'
-              }
+              selected={form.roofType === 'SLOPED'}
               title="Sloped roof"
-              onClick={() =>
-                updateField(
-                  'roofType',
-                  'SLOPED',
-                )
-              }
+              onClick={() => updateField('roofType', 'SLOPED')}
             />
 
             <OptionCard
-              selected={
-                form.roofType === 'GROUND'
-              }
+              selected={form.roofType === 'GROUND'}
               title="Ground installation"
-              onClick={() =>
-                updateField(
-                  'roofType',
-                  'GROUND',
-                )
-              }
+              onClick={() => updateField('roofType', 'GROUND')}
             />
 
             <OptionCard
-              selected={
-                form.roofType === 'UNKNOWN'
-              }
+              selected={form.roofType === 'UNKNOWN'}
               title="Not sure"
               description="Let suppliers assess it."
-              onClick={() =>
-                updateField(
-                  'roofType',
-                  'UNKNOWN',
-                )
-              }
+              onClick={() => updateField('roofType', 'UNKNOWN')}
             />
           </div>
         </div>
 
         <div>
-          <FieldLabel>
-            Property ownership
-          </FieldLabel>
+          <FieldLabel>Property ownership</FieldLabel>
 
           <div className="grid gap-3 sm:grid-cols-3">
             <OptionCard
-              selected={
-                form.ownership === 'OWNED'
-              }
+              selected={form.ownership === 'OWNED'}
               title="I own it"
-              onClick={() =>
-                updateField(
-                  'ownership',
-                  'OWNED',
-                )
-              }
+              onClick={() => updateField('ownership', 'OWNED')}
             />
 
             <OptionCard
-              selected={
-                form.ownership === 'RENTED'
-              }
+              selected={form.ownership === 'RENTED'}
               title="I rent it"
-              onClick={() =>
-                updateField(
-                  'ownership',
-                  'RENTED',
-                )
-              }
+              onClick={() => updateField('ownership', 'RENTED')}
             />
 
             <OptionCard
-              selected={
-                form.ownership === 'OTHER'
-              }
+              selected={form.ownership === 'OTHER'}
               title="Other / not sure"
-              onClick={() =>
-                updateField(
-                  'ownership',
-                  'OTHER',
-                )
-              }
+              onClick={() => updateField('ownership', 'OTHER')}
             />
           </div>
         </div>
@@ -1090,10 +915,7 @@ function SiteStep({
 /* Step 04                                                                    */
 /* -------------------------------------------------------------------------- */
 
-function PreferencesStep({
-  form,
-  updateField,
-}: StepProps) {
+function PreferencesStep({ form, updateField }: StepProps) {
   return (
     <div className="max-w-4xl">
       <StepHeader
@@ -1104,9 +926,7 @@ function PreferencesStep({
 
       <div className="space-y-8">
         <div>
-          <FieldLabel optional>
-            Budget range
-          </FieldLabel>
+          <FieldLabel optional>Budget range</FieldLabel>
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
@@ -1118,12 +938,7 @@ function PreferencesStep({
                 type="number"
                 min="0"
                 value={form.budgetMin}
-                onChange={(e) =>
-                  updateField(
-                    'budgetMin',
-                    e.target.value,
-                  )
-                }
+                onChange={(e) => updateField('budgetMin', e.target.value)}
                 placeholder="e.g. 3000"
                 className={inputClass}
               />
@@ -1138,12 +953,7 @@ function PreferencesStep({
                 type="number"
                 min="0"
                 value={form.budgetMax}
-                onChange={(e) =>
-                  updateField(
-                    'budgetMax',
-                    e.target.value,
-                  )
-                }
+                onChange={(e) => updateField('budgetMax', e.target.value)}
                 placeholder="e.g. 10000"
                 className={inputClass}
               />
@@ -1152,67 +962,35 @@ function PreferencesStep({
         </div>
 
         <div>
-          <FieldLabel>
-            What is your main priority?
-          </FieldLabel>
+          <FieldLabel>What is your main priority?</FieldLabel>
 
           <div className="grid gap-3 sm:grid-cols-2">
             <OptionCard
-              selected={
-                form.priority ===
-                'LOWEST_PRICE'
-              }
+              selected={form.priority === 'LOWEST_PRICE'}
               title="Lowest price"
               description="Minimize the upfront cost."
-              onClick={() =>
-                updateField(
-                  'priority',
-                  'LOWEST_PRICE',
-                )
-              }
+              onClick={() => updateField('priority', 'LOWEST_PRICE')}
             />
 
             <OptionCard
-              selected={
-                form.priority === 'BALANCED'
-              }
+              selected={form.priority === 'BALANCED'}
               title="Balanced value"
               description="Balance cost, quality and performance."
-              onClick={() =>
-                updateField(
-                  'priority',
-                  'BALANCED',
-                )
-              }
+              onClick={() => updateField('priority', 'BALANCED')}
             />
 
             <OptionCard
-              selected={
-                form.priority === 'QUALITY'
-              }
+              selected={form.priority === 'QUALITY'}
               title="Quality"
               description="Prioritize equipment and system quality."
-              onClick={() =>
-                updateField(
-                  'priority',
-                  'QUALITY',
-                )
-              }
+              onClick={() => updateField('priority', 'QUALITY')}
             />
 
             <OptionCard
-              selected={
-                form.priority ===
-                'RELIABILITY'
-              }
+              selected={form.priority === 'RELIABILITY'}
               title="Reliability"
               description="Prioritize dependable long-term operation."
-              onClick={() =>
-                updateField(
-                  'priority',
-                  'RELIABILITY',
-                )
-              }
+              onClick={() => updateField('priority', 'RELIABILITY')}
             />
           </div>
         </div>
@@ -1232,29 +1010,17 @@ function PreferencesStep({
             }
             className={selectClass}
           >
-            <option value="">
-              Select a timeline
-            </option>
+            <option value="">Select a timeline</option>
 
-            <option value="ASAP">
-              As soon as possible
-            </option>
+            <option value="ASAP">As soon as possible</option>
 
-            <option value="ONE_TO_THREE_MONTHS">
-              Within 1–3 months
-            </option>
+            <option value="ONE_TO_THREE_MONTHS">Within 1–3 months</option>
 
-            <option value="THREE_TO_SIX_MONTHS">
-              Within 3–6 months
-            </option>
+            <option value="THREE_TO_SIX_MONTHS">Within 3–6 months</option>
 
-            <option value="SIX_TO_TWELVE_MONTHS">
-              Within 6–12 months
-            </option>
+            <option value="SIX_TO_TWELVE_MONTHS">Within 6–12 months</option>
 
-            <option value="FLEXIBLE">
-              I'm flexible
-            </option>
+            <option value="FLEXIBLE">I'm flexible</option>
           </select>
         </div>
       </div>
@@ -1266,11 +1032,7 @@ function PreferencesStep({
 /* Step 05                                                                    */
 /* -------------------------------------------------------------------------- */
 
-function ReviewStep({
-  form,
-}: {
-  form: SolarRequestForm
-}) {
+function ReviewStep({ form }: { form: SolarRequestForm }) {
   return (
     <div className="max-w-4xl">
       <StepHeader
@@ -1281,23 +1043,15 @@ function ReviewStep({
 
       <div className="space-y-4">
         <ReviewSection title="Project">
-          <ReviewRow
-            label="Project name"
-            value={form.projectTitle}
-          />
+          <ReviewRow label="Project name" value={form.projectTitle} />
 
-          <ReviewRow
-            label="Description"
-            value={form.projectDescription}
-          />
+          <ReviewRow label="Description" value={form.projectDescription} />
         </ReviewSection>
 
         <ReviewSection title="Energy">
           <ReviewRow
             label="Property type"
-            value={formatValue(
-              form.propertyType,
-            )}
+            value={formatValue(form.propertyType)}
           />
 
           <ReviewRow
@@ -1320,49 +1074,28 @@ function ReviewStep({
         </ReviewSection>
 
         <ReviewSection title="Site">
-          <ReviewRow
-            label="Location"
-            value={form.location}
-          />
+          <ReviewRow label="Location" value={form.location} />
 
-          <ReviewRow
-            label="Installation"
-            value={formatValue(
-              form.roofType,
-            )}
-          />
+          <ReviewRow label="Installation" value={formatValue(form.roofType)} />
 
-          <ReviewRow
-            label="Ownership"
-            value={formatValue(
-              form.ownership,
-            )}
-          />
+          <ReviewRow label="Ownership" value={formatValue(form.ownership)} />
         </ReviewSection>
 
         <ReviewSection title="Preferences">
           <ReviewRow
             label="Budget"
             value={
-              form.budgetMin ||
-              form.budgetMax
+              form.budgetMin || form.budgetMax
                 ? `${form.budgetMin || '—'} → ${form.budgetMax || '—'} ${form.currency}`
                 : ''
             }
           />
 
-          <ReviewRow
-            label="Priority"
-            value={formatValue(
-              form.priority,
-            )}
-          />
+          <ReviewRow label="Priority" value={formatValue(form.priority)} />
 
           <ReviewRow
             label="Timeline"
-            value={formatValue(
-              form.targetTimeline,
-            )}
+            value={formatValue(form.targetTimeline)}
           />
         </ReviewSection>
       </div>
@@ -1374,10 +1107,9 @@ function ReviewStep({
         />
 
         <p className="text-sm leading-6 text-[var(--text-secondary)]">
-          Next, SOLVRA will interpret your natural-language
-          description and extract additional requirements.
-          You will review the AI interpretation before anything
-          is confirmed.
+          Next, SOLVRA will interpret your natural-language description and
+          extract additional requirements. You will review the AI interpretation
+          before anything is confirmed.
         </p>
       </div>
     </div>
@@ -1415,10 +1147,7 @@ function SubmitStep({
       <div className="mx-auto max-w-2xl py-8 text-center">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--text-primary)] text-[var(--bg-primary)]">
           {isSubmitting ? (
-            <Loader2
-              size={28}
-              className="animate-spin"
-            />
+            <Loader2 size={28} className="animate-spin" />
           ) : (
             <Check size={28} />
           )}
@@ -1428,14 +1157,11 @@ function SubmitStep({
           Ready to submit
         </p>
 
-        <h2 className="mt-2 text-3xl font-semibold">
-          Create your request.
-        </h2>
+        <h2 className="mt-2 text-3xl font-semibold">Create your request.</h2>
 
         <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-[var(--text-secondary)]">
-          SOLVRA will first save your request as a draft,
-          then analyze your description so you can review
-          what the AI understood.
+          SOLVRA will first save your request as a draft, then analyze your
+          description so you can review what the AI understood.
         </p>
 
         <button
@@ -1446,10 +1172,7 @@ function SubmitStep({
         >
           {isSubmitting ? (
             <>
-              <Loader2
-                size={16}
-                className="animate-spin"
-              />
+              <Loader2 size={16} className="animate-spin" />
               Analyzing request...
             </>
           ) : (
@@ -1481,8 +1204,7 @@ function SubmitStep({
         </h2>
 
         <p className="mt-3 text-sm text-[var(--text-secondary)]">
-          We're extracting useful requirements from your
-          description.
+          We're extracting useful requirements from your description.
         </p>
 
         {!isSubmitting && (
@@ -1502,10 +1224,7 @@ function SubmitStep({
     <div className="mx-auto max-w-3xl py-4">
       <div className="text-center">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-[#00E5FF]/20 bg-[#00E5FF]/[0.05]">
-          <Sparkles
-            size={28}
-            className="text-[var(--prism-cyan)]"
-          />
+          <Sparkles size={28} className="text-[var(--prism-cyan)]" />
         </div>
 
         <p className="mt-6 text-xs font-medium uppercase tracking-[0.16em] text-[var(--prism-cyan)]">
@@ -1517,8 +1236,8 @@ function SubmitStep({
         </h2>
 
         <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-[var(--text-secondary)]">
-          Review these suggestions before confirming them.
-          AI does not make the procurement decision.
+          Review these suggestions before confirming them. AI does not make the
+          procurement decision.
         </p>
       </div>
 
@@ -1572,10 +1291,7 @@ function SubmitStep({
                 type="checkbox"
                 checked={analysis.backupRequired}
                 onChange={(event) =>
-                  onAnalysisChange(
-                    'backupRequired',
-                    event.target.checked,
-                  )
+                  onAnalysisChange('backupRequired', event.target.checked)
                 }
                 className="h-4 w-4"
               />
@@ -1619,10 +1335,7 @@ function SubmitStep({
               rows={3}
               value={analysis.preferences ?? ''}
               onChange={(event) =>
-                onAnalysisChange(
-                  'preferences',
-                  event.target.value || null,
-                )
+                onAnalysisChange('preferences', event.target.value || null)
               }
               className={`${inputClass} resize-none`}
             />
@@ -1655,8 +1368,7 @@ function SubmitStep({
                       onAnalysisChange(
                         'goals',
                         analysis.goals.filter(
-                          (_, goalIndex) =>
-                            goalIndex !== index,
+                          (_, goalIndex) => goalIndex !== index,
                         ),
                       )
                     }
@@ -1676,12 +1388,7 @@ function SubmitStep({
 
           <button
             type="button"
-            onClick={() =>
-              onAnalysisChange('goals', [
-                ...analysis.goals,
-                '',
-              ])
-            }
+            onClick={() => onAnalysisChange('goals', [...analysis.goals, ''])}
             className="mt-3 inline-flex items-center gap-2 rounded-xl border border-[var(--border)] px-3 py-2 text-xs font-semibold text-[var(--text-secondary)]"
           >
             <Plus size={14} />
@@ -1689,34 +1396,27 @@ function SubmitStep({
           </button>
         </ReviewSection>
 
-        {analysis.missingInformation.length >
-          0 && (
+        {analysis.missingInformation.length > 0 && (
           <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] p-5">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--copper)]">
               Missing information
             </p>
 
             <p className="mt-2 text-xs leading-5 text-[var(--text-muted)]">
-              You can still confirm the request. These
-              details may help suppliers provide more
-              accurate proposals.
+              You can still confirm the request. These details may help
+              suppliers provide more accurate proposals.
             </p>
 
             <div className="mt-4 space-y-2">
-              {analysis.missingInformation.map(
-                (item) => (
-                  <div
-                    key={item}
-                    className="flex items-start gap-2"
-                  >
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--copper)]" />
+              {analysis.missingInformation.map((item) => (
+                <div key={item} className="flex items-start gap-2">
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--copper)]" />
 
-                    <span className="text-sm text-[var(--text-secondary)]">
-                      {item}
-                    </span>
-                  </div>
-                ),
-              )}
+                  <span className="text-sm text-[var(--text-secondary)]">
+                    {item}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -1724,10 +1424,7 @@ function SubmitStep({
         {analysis.conflicts.length > 0 && (
           <div className="rounded-xl border border-red-500/20 bg-red-500/[0.04] p-5">
             <div className="flex items-center gap-2">
-              <AlertCircle
-                size={16}
-                className="text-red-500"
-              />
+              <AlertCircle size={16} className="text-red-500" />
 
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-red-500">
                 Conflicts require attention
@@ -1735,26 +1432,21 @@ function SubmitStep({
             </div>
 
             <div className="mt-4 space-y-2">
-              {analysis.conflicts.map(
-                (conflict) => (
-                  <p
-                    key={conflict}
-                    className="text-sm text-[var(--text-secondary)]"
-                  >
-                    {conflict}
-                  </p>
-                ),
-              )}
+              {analysis.conflicts.map((conflict) => (
+                <p
+                  key={conflict}
+                  className="text-sm text-[var(--text-secondary)]"
+                >
+                  {conflict}
+                </p>
+              ))}
             </div>
           </div>
         )}
 
         <div className="rounded-xl border border-[#00E5FF]/10 bg-[#00E5FF]/[0.025] p-5">
           <div className="flex items-center gap-3">
-            <Sparkles
-              size={16}
-              className="text-[var(--prism-cyan)]"
-            />
+            <Sparkles size={16} className="text-[var(--prism-cyan)]" />
 
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--prism-cyan)]">
               AI-Suggested — Confirm to Save
@@ -1762,11 +1454,7 @@ function SubmitStep({
           </div>
 
           <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">
-            Confidence:{' '}
-            {Math.round(
-              analysis.extractionConfidence *
-                100,
-            )}
+            Confidence: {Math.round(analysis.extractionConfidence * 100)}
             %. Review the interpretation before confirming.
           </p>
         </div>
@@ -1776,18 +1464,12 @@ function SubmitStep({
         <button
           type="button"
           onClick={onConfirm}
-          disabled={
-            isSubmitting ||
-            analysis.conflicts.length > 0
-          }
+          disabled={isSubmitting || analysis.conflicts.length > 0}
           className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--copper)] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--copper-hover)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
         >
           {isSubmitting ? (
             <>
-              <Loader2
-                size={16}
-                className="animate-spin"
-              />
+              <Loader2 size={16} className="animate-spin" />
               Confirming...
             </>
           ) : (
@@ -1799,8 +1481,8 @@ function SubmitStep({
         </button>
 
         <p className="text-xs text-[var(--text-muted)]">
-          Your confirmation saves the requirements and opens
-          the request for supplier bidding.
+          Your confirmation saves the requirements and opens the request for
+          supplier bidding.
         </p>
       </div>
     </div>
@@ -1845,33 +1527,19 @@ function ReviewSection({
 }) {
   return (
     <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] p-5">
-      <h3 className="mb-4 text-sm font-semibold">
-        {title}
-      </h3>
+      <h3 className="mb-4 text-sm font-semibold">{title}</h3>
 
-      <div className="space-y-3">
-        {children}
-      </div>
+      <div className="space-y-3">{children}</div>
     </div>
   )
 }
 
-function ReviewRow({
-  label,
-  value,
-}: {
-  label: string
-  value: string
-}) {
+function ReviewRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="grid gap-1 border-b border-[var(--border)] pb-3 last:border-0 last:pb-0 sm:grid-cols-[180px_1fr]">
-      <span className="text-xs text-[var(--text-muted)]">
-        {label}
-      </span>
+      <span className="text-xs text-[var(--text-muted)]">{label}</span>
 
-      <span className="break-words text-sm">
-        {value || 'Not provided'}
-      </span>
+      <span className="break-words text-sm">{value || 'Not provided'}</span>
     </div>
   )
 }
@@ -1882,9 +1550,7 @@ function formatValue(value: string) {
   return value
     .replaceAll('_', ' ')
     .toLowerCase()
-    .replace(/\b\w/g, (letter) =>
-      letter.toUpperCase(),
-    )
+    .replace(/\b\w/g, (letter) => letter.toUpperCase())
 }
 
 export default CreateSolarRequestPage

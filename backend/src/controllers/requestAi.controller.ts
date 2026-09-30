@@ -6,10 +6,7 @@ import { prisma } from '../config/prisma.js'
 import { extractRequirements } from '../services/ai/requirementExtraction.service.js'
 import { confirmRequirementSchema } from '../validators/requirement.validator.js'
 
-export async function analyzeRequest(
-  req: AuthenticatedRequest,
-  res: Response,
-) {
+export async function analyzeRequest(req: AuthenticatedRequest, res: Response) {
   try {
     const userId = req.user?.userId
     const requestId = Array.isArray(req.params.id)
@@ -51,24 +48,22 @@ export async function analyzeRequest(
     }
 
     const analysis = await extractRequirements({
-  description: request.rawDescription,
-  propertyType: request.propertyType,
-  monthlyElectricityBill: request.monthlyElectricityBill
-    ? Number(request.monthlyElectricityBill)
-    : null,
-  averageMonthlyConsumption: request.averageMonthlyConsumption
-    ? Number(request.averageMonthlyConsumption)
-    : null,
-  location: request.location,
-  roofType: request.roofType,
-  ownership: request.ownership,
-  budget: request.budget
-    ? Number(request.budget)
-    : null,
-  currency: request.currency,
-  priority: request.priority,
-  timeline: request.timeline,
-})
+      description: request.rawDescription,
+      propertyType: request.propertyType,
+      monthlyElectricityBill: request.monthlyElectricityBill
+        ? Number(request.monthlyElectricityBill)
+        : null,
+      averageMonthlyConsumption: request.averageMonthlyConsumption
+        ? Number(request.averageMonthlyConsumption)
+        : null,
+      location: request.location,
+      roofType: request.roofType,
+      ownership: request.ownership,
+      budget: request.budget ? Number(request.budget) : null,
+      currency: request.currency,
+      priority: request.priority,
+      timeline: request.timeline,
+    })
 
     return res.status(200).json({
       success: true,
@@ -93,15 +88,15 @@ export async function confirmRequirements(
     const userId = req.user?.userId
 
     const requestId = Array.isArray(req.params.id)
-  ? req.params.id[0]
-  : req.params.id
+      ? req.params.id[0]
+      : req.params.id
 
     if (!requestId) {
-  return res.status(400).json({
-    success: false,
-    message: 'Request ID is required',
-   })
-   }
+      return res.status(400).json({
+        success: false,
+        message: 'Request ID is required',
+      })
+    }
 
     if (!userId) {
       return res.status(401).json({
@@ -110,9 +105,7 @@ export async function confirmRequirements(
       })
     }
 
-    const validation = confirmRequirementSchema.safeParse(
-      req.body,
-    )
+    const validation = confirmRequirementSchema.safeParse(req.body)
 
     if (!validation.success) {
       return res.status(400).json({
@@ -150,76 +143,70 @@ export async function confirmRequirements(
     }
 
     const data = validation.data
-    
+
     if (data.conflicts.length > 0) {
-  return res.status(400).json({
-    success: false,
-    message:
-      'Requirements contain unresolved conflicts. Please resolve them before confirming.',
-    conflicts: data.conflicts,
-  })
-}
-   const applianceLoad =
-  data.applianceLoad === null
-    ? Prisma.JsonNull
-    : (data.applianceLoad as Prisma.InputJsonValue)
-
-   const usagePattern =
-  data.usagePattern === null
-    ? Prisma.JsonNull
-    : (data.usagePattern as Prisma.InputJsonValue)
-
-
-    const requirementProfile =
-      await prisma.requirementProfile.upsert({
-        where: {
-          requestId,
-        },
-
-        create: {
-          requestId,
-
-          occupantsOrUsers: data.occupantsOrUsers,
-          acUnitsCount: data.acUnitsCount,
-          applianceLoad,
-          usagePattern,
-
-          backupRequired: data.backupRequired,
-
-          currentElectricitySituation:
-            data.currentElectricitySituation,
-
-          goals: data.goals,
-
-          preferences: data.preferences,
-
-          extractionConfidence:
-            data.extractionConfidence,
-
-          confirmedByBuyer: true,
-        },
-
-        update: {
-          occupantsOrUsers: data.occupantsOrUsers,
-          acUnitsCount: data.acUnitsCount,
-          applianceLoad,
-          usagePattern,
-
-          backupRequired: data.backupRequired,
-
-          currentElectricitySituation:
-            data.currentElectricitySituation,
-
-          goals: data.goals,
-
-          preferences: data.preferences,
-
-          extractionConfidence:
-            data.extractionConfidence,
-
-          confirmedByBuyer: true,
-        },
+      return res.status(400).json({
+        success: false,
+        message:
+          'Requirements contain unresolved conflicts. Please resolve them before confirming.',
+        conflicts: data.conflicts,
       })
+    }
+    const applianceLoad =
+      data.applianceLoad === null
+        ? Prisma.JsonNull
+        : (data.applianceLoad as Prisma.InputJsonValue)
+
+    const usagePattern =
+      data.usagePattern === null
+        ? Prisma.JsonNull
+        : (data.usagePattern as Prisma.InputJsonValue)
+
+    const requirementProfile = await prisma.requirementProfile.upsert({
+      where: {
+        requestId,
+      },
+
+      create: {
+        requestId,
+
+        occupantsOrUsers: data.occupantsOrUsers,
+        acUnitsCount: data.acUnitsCount,
+        applianceLoad,
+        usagePattern,
+
+        backupRequired: data.backupRequired,
+
+        currentElectricitySituation: data.currentElectricitySituation,
+
+        goals: data.goals,
+
+        preferences: data.preferences,
+
+        extractionConfidence: data.extractionConfidence,
+
+        confirmedByBuyer: true,
+      },
+
+      update: {
+        occupantsOrUsers: data.occupantsOrUsers,
+        acUnitsCount: data.acUnitsCount,
+        applianceLoad,
+        usagePattern,
+
+        backupRequired: data.backupRequired,
+
+        currentElectricitySituation: data.currentElectricitySituation,
+
+        goals: data.goals,
+
+        preferences: data.preferences,
+
+        extractionConfidence: data.extractionConfidence,
+
+        confirmedByBuyer: true,
+      },
+    })
 
     await prisma.activityLog.create({
       data: {
@@ -239,10 +226,7 @@ export async function confirmRequirements(
       requirementProfile,
     })
   } catch (error) {
-    console.error(
-      'Confirm requirements error:',
-      error,
-    )
+    console.error('Confirm requirements error:', error)
 
     return res.status(500).json({
       success: false,

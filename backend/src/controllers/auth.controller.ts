@@ -1,10 +1,7 @@
 import type { Request, Response } from 'express'
 
 import { prisma } from '../config/prisma.js'
-import {
-  loginUser,
-  registerUser,
-} from '../services/auth.service.js'
+import { loginUser, registerUser } from '../services/auth.service.js'
 import {
   loginSchema,
   registerSchema,
@@ -20,19 +17,20 @@ import {
 import { sendPasswordResetEmail } from '../services/email.service.js'
 
 const isProduction = process.env.NODE_ENV === 'production'
+const authCookieSameSite =
+  isProduction && process.env.AUTH_COOKIE_SAME_SITE === 'none'
+    ? ('none' as const)
+    : ('lax' as const)
 
 const authCookieOptions = {
   httpOnly: true,
   secure: isProduction,
-  sameSite: 'lax' as const,
+  sameSite: authCookieSameSite,
   maxAge: 7 * 24 * 60 * 60 * 1000,
   path: '/',
 }
 
-export async function register(
-  req: Request,
-  res: Response,
-): Promise<void> {
+export async function register(req: Request, res: Response): Promise<void> {
   const validation = registerSchema.safeParse(req.body)
 
   if (!validation.success) {
@@ -47,11 +45,7 @@ export async function register(
   try {
     const result = await registerUser(validation.data)
 
-    res.cookie(
-      'solvra_token',
-      result.accessToken,
-      authCookieOptions,
-    )
+    res.cookie('solvra_token', result.accessToken, authCookieOptions)
 
     res.status(201).json({
       success: true,
@@ -59,10 +53,7 @@ export async function register(
       user: result.user,
     })
   } catch (error) {
-    if (
-      error instanceof Error &&
-      error.message === 'EMAIL_ALREADY_EXISTS'
-    ) {
+    if (error instanceof Error && error.message === 'EMAIL_ALREADY_EXISTS') {
       res.status(409).json({
         success: false,
         message: 'An account with this email already exists.',
@@ -79,10 +70,7 @@ export async function register(
   }
 }
 
-export async function login(
-  req: Request,
-  res: Response,
-): Promise<void> {
+export async function login(req: Request, res: Response): Promise<void> {
   const validation = loginSchema.safeParse(req.body)
 
   if (!validation.success) {
@@ -97,11 +85,7 @@ export async function login(
   try {
     const result = await loginUser(validation.data)
 
-    res.cookie(
-      'solvra_token',
-      result.accessToken,
-      authCookieOptions,
-    )
+    res.cookie('solvra_token', result.accessToken, authCookieOptions)
 
     res.status(200).json({
       success: true,
@@ -109,10 +93,7 @@ export async function login(
       user: result.user,
     })
   } catch (error) {
-    if (
-      error instanceof Error &&
-      error.message === 'ACCOUNT_INACTIVE'
-    ) {
+    if (error instanceof Error && error.message === 'ACCOUNT_INACTIVE') {
       res.status(403).json({
         success: false,
         message: 'This account is currently inactive.',
@@ -120,10 +101,7 @@ export async function login(
       return
     }
 
-    if (
-      error instanceof Error &&
-      error.message === 'INVALID_CREDENTIALS'
-    ) {
+    if (error instanceof Error && error.message === 'INVALID_CREDENTIALS') {
       res.status(401).json({
         success: false,
         message: 'Invalid email or password.',
@@ -196,14 +174,11 @@ export async function me(
   })
 }
 
-export function logout(
-  _req: Request,
-  res: Response,
-): void {
+export function logout(_req: Request, res: Response): void {
   res.clearCookie('solvra_token', {
     httpOnly: true,
     secure: isProduction,
-    sameSite: 'lax',
+    sameSite: authCookieSameSite,
     path: '/',
   })
 
@@ -216,9 +191,7 @@ export async function forgotPassword(
   req: Request,
   res: Response,
 ): Promise<void> {
-  
-  const validation =
-    forgotPasswordSchema.safeParse(req.body)
+  const validation = forgotPasswordSchema.safeParse(req.body)
 
   if (!validation.success) {
     res.status(400).json({
@@ -229,15 +202,10 @@ export async function forgotPassword(
   }
 
   try {
-    const result = await requestPasswordReset(
-      validation.data,
-    )
+    const result = await requestPasswordReset(validation.data)
 
     if (result.resetToken) {
-      await sendPasswordResetEmail(
-        validation.data.email,
-        result.resetToken,
-      )
+      await sendPasswordResetEmail(validation.data.email, result.resetToken)
     }
 
     // Deliberately identical whether the email exists or not.
@@ -247,15 +215,11 @@ export async function forgotPassword(
         'If an account exists for that email, a password reset link has been sent.',
     })
   } catch (error) {
-    console.error(
-      'Forgot password error:',
-      error,
-    )
+    console.error('Forgot password error:', error)
 
     res.status(500).json({
       success: false,
-      message:
-        'Unable to process your request right now.',
+      message: 'Unable to process your request right now.',
     })
   }
 }
@@ -264,15 +228,13 @@ export async function resetPasswordHandler(
   req: Request,
   res: Response,
 ): Promise<void> {
-  const validation =
-    resetPasswordSchema.safeParse(req.body)
+  const validation = resetPasswordSchema.safeParse(req.body)
 
   if (!validation.success) {
     res.status(400).json({
       success: false,
       message: 'Please check your password information.',
-      errors:
-        validation.error.flatten().fieldErrors,
+      errors: validation.error.flatten().fieldErrors,
     })
     return
   }
@@ -282,31 +244,22 @@ export async function resetPasswordHandler(
 
     res.status(200).json({
       success: true,
-      message:
-        'Password reset successfully. You can now sign in.',
+      message: 'Password reset successfully. You can now sign in.',
     })
   } catch (error) {
-    if (
-      error instanceof Error &&
-      error.message === 'INVALID_RESET_TOKEN'
-    ) {
+    if (error instanceof Error && error.message === 'INVALID_RESET_TOKEN') {
       res.status(400).json({
         success: false,
-        message:
-          'This password reset link is invalid or has expired.',
+        message: 'This password reset link is invalid or has expired.',
       })
       return
     }
 
-    console.error(
-      'Reset password error:',
-      error,
-    )
+    console.error('Reset password error:', error)
 
     res.status(500).json({
       success: false,
-      message:
-        'Unable to reset your password right now.',
+      message: 'Unable to reset your password right now.',
     })
   }
 }

@@ -12,19 +12,10 @@ const router = Router()
 
 router.use(authenticate)
 
-router.put(
-  '/requests/:requestId/criteria',
-  setEvaluationCriteria,
-)
+router.put('/requests/:requestId/criteria', setEvaluationCriteria)
 
-router.post(
-  '/requests/:requestId/run',
-  runEvaluation,
-)
+router.post('/requests/:requestId/run', runEvaluation)
 
-router.get(
-  '/requests/:requestId',
-  getEvaluation,
-)
+router.get('/requests/:requestId', getEvaluation)
 
 export default router

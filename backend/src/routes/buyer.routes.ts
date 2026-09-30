@@ -5,9 +5,7 @@ import {
   updateBuyerProfile,
 } from '../controllers/buyer.controller.js'
 
-import {
-  getBuyerDashboard,
-} from '../controllers/buyerDashboard.controller.js'
+import { getBuyerDashboard } from '../controllers/buyerDashboard.controller.js'
 
 import { authenticate } from '../middleware/auth.middleware.js'
 

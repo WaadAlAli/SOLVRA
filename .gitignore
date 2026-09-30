@@ -26,6 +26,9 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+.agents/
+.claude/
+.windsurf/
 
 # Prisma
 *.db

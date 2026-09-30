@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import  DashboardShell  from '../../../components/dashboard/DashboardShell'
+import DashboardShell from '../../../components/dashboard/DashboardShell'
 import {
   getMyRequests,
   type SolarRequest,
@@ -76,16 +76,10 @@ function formatNumber(value: number | string | null | undefined) {
 }
 
 function getSupplierName(result: EvaluationResult) {
-  return (
-    result.bidVersion?.bid?.supplier?.companyName ??
-    'Supplier'
-  )
+  return result.bidVersion?.bid?.supplier?.companyName ?? 'Supplier'
 }
 
-function getCriterionScore(
-  result: EvaluationResult,
-  criterion: string,
-) {
+function getCriterionScore(result: EvaluationResult, criterion: string) {
   const score = result.criterionScores?.[criterion]
 
   if (score === undefined || score === null) {
@@ -103,8 +97,7 @@ export default function ComparePage() {
   const [requestTitle, setRequestTitle] = useState('')
   const [requestStatus, setRequestStatus] = useState('')
 
-  const [criteria, setCriteria] =
-    useState<CriterionState[]>(DEFAULT_CRITERIA)
+  const [criteria, setCriteria] = useState<CriterionState[]>(DEFAULT_CRITERIA)
 
   const [evaluationResults, setEvaluationResults] = useState<
     EvaluationResult[]
@@ -180,8 +173,7 @@ export default function ComparePage() {
         setEvaluationResults(evaluation.results ?? [])
 
         if (evaluation.results?.length > 0) {
-          const firstScores =
-            evaluation.results[0].criterionScores ?? {}
+          const firstScores = evaluation.results[0].criterionScores ?? {}
 
           const savedCriteria = DEFAULT_CRITERIA.map((criterion) => ({
             ...criterion,
@@ -215,10 +207,7 @@ export default function ComparePage() {
     }
   }
 
-  function updateWeight(
-    criterionName: CriterionName,
-    value: string,
-  ) {
+  function updateWeight(criterionName: CriterionName, value: string) {
     const parsed = Number(value)
 
     setCriteria((current) =>
@@ -235,8 +224,7 @@ export default function ComparePage() {
 
   function addCriterion() {
     const available = CRITERION_OPTIONS.find(
-      (option) =>
-        !criteria.some((criterion) => criterion.name === option.name),
+      (option) => !criteria.some((criterion) => criterion.name === option.name),
     )
 
     if (!available) {
@@ -336,9 +324,7 @@ export default function ComparePage() {
 
       setRequestStatus('AWARDED')
 
-      setSuccessMessage(
-        `Request awarded to ${supplierName} successfully.`,
-      )
+      setSuccessMessage(`Request awarded to ${supplierName} successfully.`)
 
       await loadComparison(selectedRequestId)
     } catch (err) {
@@ -355,9 +341,7 @@ export default function ComparePage() {
     return (
       <DashboardShell role="BUYER">
         <div className="flex min-h-[400px] items-center justify-center">
-          <p className="text-sm text-slate-500">
-            Loading your requests...
-          </p>
+          <p className="text-sm text-slate-500">Loading your requests...</p>
         </div>
       </DashboardShell>
     )
@@ -391,9 +375,7 @@ export default function ComparePage() {
 
               <select
                 value={selectedRequestId}
-                onChange={(event) =>
-                  setSelectedRequestId(event.target.value)
-                }
+                onChange={(event) => setSelectedRequestId(event.target.value)}
                 className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
               >
                 {requests.map((request) => (
@@ -636,10 +618,7 @@ export default function ComparePage() {
                         max="100"
                         value={criterion.weightPercent}
                         onChange={(event) =>
-                          updateWeight(
-                            criterion.name,
-                            event.target.value,
-                          )
+                          updateWeight(criterion.name, event.target.value)
                         }
                         className="w-24 rounded-lg border border-slate-200 bg-white px-3 py-2 text-right text-sm font-semibold text-slate-800 outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
                       />
@@ -649,9 +628,7 @@ export default function ComparePage() {
                       {criteria.length > 1 && (
                         <button
                           type="button"
-                          onClick={() =>
-                            removeCriterion(criterion.name)
-                          }
+                          onClick={() => removeCriterion(criterion.name)}
                           className="rounded-lg px-2 py-2 text-xs font-medium text-slate-400 hover:bg-white hover:text-red-600"
                         >
                           Remove
@@ -682,15 +659,11 @@ export default function ComparePage() {
                     type="button"
                     onClick={handleRunEvaluation}
                     disabled={
-                      loadingEvaluation ||
-                      !isWeightValid ||
-                      bids.length === 0
+                      loadingEvaluation || !isWeightValid || bids.length === 0
                     }
                     className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
                   >
-                    {loadingEvaluation
-                      ? 'Evaluating...'
-                      : 'Run Evaluation'}
+                    {loadingEvaluation ? 'Evaluating...' : 'Run Evaluation'}
                   </button>
                 </div>
               </div>
@@ -761,23 +734,23 @@ export default function ComparePage() {
                                 )}
                               </div>
 
-                             <div className="mt-2 flex flex-wrap gap-3 text-sm text-slate-500">
-  <span>
-    TCO:{' '}
-    <strong className="text-slate-800">
-      {formatNumber(result.tcoAmount)}
-    </strong>
-  </span>
+                              <div className="mt-2 flex flex-wrap gap-3 text-sm text-slate-500">
+                                <span>
+                                  TCO:{' '}
+                                  <strong className="text-slate-800">
+                                    {formatNumber(result.tcoAmount)}
+                                  </strong>
+                                </span>
 
-  <span>
-    Score:{' '}
-    <strong className="text-slate-800">
-      {Number(result.weightedTotalScore).toFixed(2)}
-      /100
-    </strong>
-  </span>
-
-
+                                <span>
+                                  Score:{' '}
+                                  <strong className="text-slate-800">
+                                    {Number(result.weightedTotalScore).toFixed(
+                                      2,
+                                    )}
+                                    /100
+                                  </strong>
+                                </span>
 
                                 <span>
                                   {result.isCompliant
@@ -795,17 +768,14 @@ export default function ComparePage() {
                                 disabled
                                 className="rounded-xl bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-500"
                               >
-                                {awarded
-                                  ? 'Awarded'
-                                  : 'Request awarded'}
+                                {awarded ? 'Awarded' : 'Request awarded'}
                               </button>
                             ) : (
                               <button
                                 type="button"
                                 onClick={() => handleAward(result)}
                                 disabled={
-                                  loadingAward !== null ||
-                                  !result.isCompliant
+                                  loadingAward !== null || !result.isCompliant
                                 }
                                 className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
                               >
@@ -830,10 +800,7 @@ export default function ComparePage() {
 
                               <div className="mt-2 flex items-end justify-between gap-2">
                                 <span className="text-lg font-semibold text-slate-900">
-                                  {getCriterionScore(
-                                    result,
-                                    criterion.name,
-                                  )}
+                                  {getCriterionScore(result, criterion.name)}
                                 </span>
 
                                 <span className="text-xs text-slate-400">
@@ -864,10 +831,9 @@ export default function ComparePage() {
               </p>
 
               <p className="mt-2 text-sm leading-6 text-slate-600">
-                The cheapest quote is not automatically the selected
-                proposal. SOLVRA evaluates the factors you define,
-                calculates the score deterministically, and keeps the
-                decision transparent.
+                The cheapest quote is not automatically the selected proposal.
+                SOLVRA evaluates the factors you define, calculates the score
+                deterministically, and keeps the decision transparent.
               </p>
             </div>
           </>
@@ -888,15 +854,10 @@ function ComparisonRow({
 }) {
   return (
     <tr>
-      <td className="px-6 py-4 font-medium text-slate-600">
-        {label}
-      </td>
+      <td className="px-6 py-4 font-medium text-slate-600">{label}</td>
 
       {bids.map((bid) => (
-        <td
-          key={bid.id}
-          className="px-6 py-4 text-slate-800"
-        >
+        <td key={bid.id} className="px-6 py-4 text-slate-800">
           {render(bid)}
         </td>
       ))}

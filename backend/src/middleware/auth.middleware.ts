@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express'
 import { verifyAccessToken } from '../utils/jwt.js'
+import { prisma } from '../config/prisma.js'
 
 export interface AuthenticatedRequest extends Request {
   user?: {
@@ -8,11 +9,11 @@ export interface AuthenticatedRequest extends Request {
   }
 }
 
-export function authenticate(
+export async function authenticate(
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction,
-): void {
+): Promise<void> {
   const token = req.cookies.solvra_token
 
   if (!token) {
@@ -26,7 +27,30 @@ export function authenticate(
   try {
     const payload = verifyAccessToken(token)
 
-    req.user = payload
+    const user = await prisma.user.findUnique({
+      where: {
+        id: payload.userId,
+      },
+      select: {
+        id: true,
+        role: true,
+        isActive: true,
+      },
+    })
+
+    if (!user || !user.isActive) {
+      res.status(401).json({
+        success: false,
+        message: 'Your account is inactive or no longer exists.',
+      })
+      return
+    }
+
+    req.user = {
+      userId: user.id,
+      role: user.role,
+    }
+
     next()
   } catch {
     res.status(401).json({

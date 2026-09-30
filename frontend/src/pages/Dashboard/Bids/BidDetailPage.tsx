@@ -14,8 +14,11 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 
 import DashboardShell from '../../../components/dashboard/DashboardShell'
-import { getRequestBidById, type RequestBid } from '../../../services/bid.service'
-import {createNegotiation} from '../../../services/negotiation.service'
+import {
+  getRequestBidById,
+  type RequestBid,
+} from '../../../services/bid.service'
+import { createNegotiation } from '../../../services/negotiation.service'
 
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString(undefined, {
@@ -42,7 +45,7 @@ function BidDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [startingNegotiation, setStartingNegotiation] = useState(false)
-  const [negotiationError, setNegotiationError] = useState('') 
+  const [negotiationError, setNegotiationError] = useState('')
 
   useEffect(() => {
     if (!requestId || !bidId) {
@@ -76,31 +79,31 @@ function BidDetailPage() {
     void loadBid()
   }, [requestId, bidId])
   const handleStartNegotiation = async () => {
-  if (!bidId) {
-    return
-  }
-
-  try {
-    setStartingNegotiation(true)
-    setNegotiationError('')
-
-    const response = await createNegotiation(bidId)
-
-    if (!response.success || !response.negotiation?.id) {
-      throw new Error(response.message || 'Unable to start negotiation.')
+    if (!bidId) {
+      return
     }
 
-    navigate(`/dashboard/negotiations?negotiationId=${response.negotiation.id}`)
-  } catch (err) {
-    setNegotiationError(
-      err instanceof Error
-        ? err.message
-        : 'Unable to start negotiation.',
-    )
-  } finally {
-    setStartingNegotiation(false)
+    try {
+      setStartingNegotiation(true)
+      setNegotiationError('')
+
+      const response = await createNegotiation(bidId)
+
+      if (!response.success || !response.negotiation?.id) {
+        throw new Error(response.message || 'Unable to start negotiation.')
+      }
+
+      navigate(
+        `/dashboard/negotiations?negotiationId=${response.negotiation.id}`,
+      )
+    } catch (err) {
+      setNegotiationError(
+        err instanceof Error ? err.message : 'Unable to start negotiation.',
+      )
+    } finally {
+      setStartingNegotiation(false)
+    }
   }
-}
 
   return (
     <DashboardShell role="BUYER">
@@ -126,7 +129,9 @@ function BidDetailPage() {
 
         {!loading && error && (
           <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-6">
-            <p className="text-sm font-semibold text-red-500">Unable to load bid</p>
+            <p className="text-sm font-semibold text-red-500">
+              Unable to load bid
+            </p>
             <p className="mt-2 text-sm text-[var(--text-secondary)]">{error}</p>
           </div>
         )}
@@ -159,33 +164,35 @@ function BidDetailPage() {
 
                   <div className="mt-3 flex items-center gap-2 text-sm text-[var(--text-secondary)]">
                     <MapPin size={15} />
-                    {bid.supplier.serviceAreas.length > 0 ? bid.supplier.serviceAreas.join(', ') : 'Service area not specified'}
+                    {bid.supplier.serviceAreas.length > 0
+                      ? bid.supplier.serviceAreas.join(', ')
+                      : 'Service area not specified'}
                   </div>
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-  <Link
-    to={`/dashboard/compare?requestId=${requestId}`}
-    className="inline-flex items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] px-4 py-2.5 text-xs font-semibold transition hover:border-[var(--copper)]/50"
-  >
-    Compare bids
-  </Link>
+                  <Link
+                    to={`/dashboard/compare?requestId=${requestId}`}
+                    className="inline-flex items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] px-4 py-2.5 text-xs font-semibold transition hover:border-[var(--copper)]/50"
+                  >
+                    Compare bids
+                  </Link>
 
-  <button
-    type="button"
-    onClick={handleStartNegotiation}
-    disabled={startingNegotiation}
-    className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--copper)] px-4 py-2.5 text-xs font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-  >
-    <MessageCircle size={14} />
-    {startingNegotiation ? 'Starting...' : 'Start Negotiation'}
-  </button>
-</div>
-{negotiationError && (
-  <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-500">
-    {negotiationError}
-  </div>
-)}
+                  <button
+                    type="button"
+                    onClick={handleStartNegotiation}
+                    disabled={startingNegotiation}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--copper)] px-4 py-2.5 text-xs font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <MessageCircle size={14} />
+                    {startingNegotiation ? 'Starting...' : 'Start Negotiation'}
+                  </button>
+                </div>
+                {negotiationError && (
+                  <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-500">
+                    {negotiationError}
+                  </div>
+                )}
               </div>
             </section>
 
@@ -197,17 +204,29 @@ function BidDetailPage() {
               />
               <SummaryCard
                 label="System size"
-                value={bid.latestVersion?.panelCapacityKw ? `${formatValue(bid.latestVersion.panelCapacityKw)} kW` : 'Not specified'}
+                value={
+                  bid.latestVersion?.panelCapacityKw
+                    ? `${formatValue(bid.latestVersion.panelCapacityKw)} kW`
+                    : 'Not specified'
+                }
                 icon={<BatteryCharging size={15} />}
               />
               <SummaryCard
                 label="Battery"
-                value={bid.latestVersion?.batteryCapacityKwh ? `${formatValue(bid.latestVersion.batteryCapacityKwh)} kWh` : 'Not specified'}
+                value={
+                  bid.latestVersion?.batteryCapacityKwh
+                    ? `${formatValue(bid.latestVersion.batteryCapacityKwh)} kWh`
+                    : 'Not specified'
+                }
                 icon={<BatteryCharging size={15} />}
               />
               <SummaryCard
                 label="Warranty"
-                value={bid.latestVersion?.warrantyYears ? `${formatValue(bid.latestVersion.warrantyYears)} years` : 'Not specified'}
+                value={
+                  bid.latestVersion?.warrantyYears
+                    ? `${formatValue(bid.latestVersion.warrantyYears)} years`
+                    : 'Not specified'
+                }
                 icon={<ShieldCheck size={15} />}
               />
             </section>
@@ -221,9 +240,22 @@ function BidDetailPage() {
 
                 <div className="space-y-3 text-sm text-[var(--text-secondary)]">
                   <InfoRow label="Company" value={bid.supplier.companyName} />
-                  <InfoRow label="Certifications" value={bid.supplier.certifications || 'Not specified'} />
-                  <InfoRow label="Service areas" value={bid.supplier.serviceAreas.length > 0 ? bid.supplier.serviceAreas.join(', ') : 'Not specified'} />
-                  <InfoRow label="Submitted" value={formatDate(bid.createdAt)} />
+                  <InfoRow
+                    label="Certifications"
+                    value={bid.supplier.certifications || 'Not specified'}
+                  />
+                  <InfoRow
+                    label="Service areas"
+                    value={
+                      bid.supplier.serviceAreas.length > 0
+                        ? bid.supplier.serviceAreas.join(', ')
+                        : 'Not specified'
+                    }
+                  />
+                  <InfoRow
+                    label="Submitted"
+                    value={formatDate(bid.createdAt)}
+                  />
                 </div>
               </div>
 
@@ -234,10 +266,26 @@ function BidDetailPage() {
                 </div>
 
                 <div className="space-y-3 text-sm text-[var(--text-secondary)]">
-                  <InfoRow label="Inverter" value={bid.latestVersion?.inverterSpec || 'Not specified'} />
-                  <InfoRow label="Battery type" value={bid.latestVersion?.batteryType || 'Not specified'} />
-                  <InfoRow label="Installation timeline" value={bid.latestVersion?.deliveryTimeDays ? `${formatValue(bid.latestVersion.deliveryTimeDays)} days` : 'Not specified'} />
-                  <InfoRow label="Payment terms" value={bid.latestVersion?.paymentTerms || 'Not specified'} />
+                  <InfoRow
+                    label="Inverter"
+                    value={bid.latestVersion?.inverterSpec || 'Not specified'}
+                  />
+                  <InfoRow
+                    label="Battery type"
+                    value={bid.latestVersion?.batteryType || 'Not specified'}
+                  />
+                  <InfoRow
+                    label="Installation timeline"
+                    value={
+                      bid.latestVersion?.deliveryTimeDays
+                        ? `${formatValue(bid.latestVersion.deliveryTimeDays)} days`
+                        : 'Not specified'
+                    }
+                  />
+                  <InfoRow
+                    label="Payment terms"
+                    value={bid.latestVersion?.paymentTerms || 'Not specified'}
+                  />
                 </div>
               </div>
             </section>
@@ -250,7 +298,10 @@ function BidDetailPage() {
 
               <div className="space-y-4">
                 {bid.versions.map((version) => (
-                  <div key={version.id} className="rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] p-4">
+                  <div
+                    key={version.id}
+                    className="rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] p-4"
+                  >
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div>
                         <p className="text-sm font-semibold text-[var(--text-primary)]">
@@ -267,10 +318,34 @@ function BidDetailPage() {
                     </div>
 
                     <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                      <InfoRow label="Total price" value={formatValue(version.totalPrice)} />
-                      <InfoRow label="Capacity" value={version.panelCapacityKw ? `${formatValue(version.panelCapacityKw)} kW` : 'Not specified'} />
-                      <InfoRow label="Battery capacity" value={version.batteryCapacityKwh ? `${formatValue(version.batteryCapacityKwh)} kWh` : 'Not specified'} />
-                      <InfoRow label="Warranty" value={version.warrantyYears ? `${formatValue(version.warrantyYears)} years` : 'Not specified'} />
+                      <InfoRow
+                        label="Total price"
+                        value={formatValue(version.totalPrice)}
+                      />
+                      <InfoRow
+                        label="Capacity"
+                        value={
+                          version.panelCapacityKw
+                            ? `${formatValue(version.panelCapacityKw)} kW`
+                            : 'Not specified'
+                        }
+                      />
+                      <InfoRow
+                        label="Battery capacity"
+                        value={
+                          version.batteryCapacityKwh
+                            ? `${formatValue(version.batteryCapacityKwh)} kWh`
+                            : 'Not specified'
+                        }
+                      />
+                      <InfoRow
+                        label="Warranty"
+                        value={
+                          version.warrantyYears
+                            ? `${formatValue(version.warrantyYears)} years`
+                            : 'Not specified'
+                        }
+                      />
                     </div>
 
                     {version.changeSummary && (
@@ -300,7 +375,9 @@ function BidDetailPage() {
                       className="flex items-center justify-between gap-4 rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] px-4 py-3 text-sm text-[var(--text-primary)] transition hover:border-[var(--copper)]/50"
                     >
                       <span>{document.fileType}</span>
-                      <span className="text-[var(--text-muted)]">{formatDate(document.uploadedAt)}</span>
+                      <span className="text-[var(--text-muted)]">
+                        {formatDate(document.uploadedAt)}
+                      </span>
                     </a>
                   ))}
                 </div>

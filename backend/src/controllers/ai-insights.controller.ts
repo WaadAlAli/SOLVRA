@@ -134,16 +134,21 @@ export async function getRequestInsights(
               confirmedByBuyer: request.requirementProfile.confirmedByBuyer,
               occupantsOrUsers: request.requirementProfile.occupantsOrUsers,
               acUnitsCount: request.requirementProfile.acUnitsCount,
-              applianceLoad:
-                request.requirementProfile.applianceLoad as Record<string, unknown> | null,
-              usagePattern:
-                request.requirementProfile.usagePattern as Record<string, unknown> | null,
+              applianceLoad: request.requirementProfile.applianceLoad as Record<
+                string,
+                unknown
+              > | null,
+              usagePattern: request.requirementProfile.usagePattern as Record<
+                string,
+                unknown
+              > | null,
               backupRequired: request.requirementProfile.backupRequired,
               currentElectricitySituation:
                 request.requirementProfile.currentElectricitySituation,
               goals: request.requirementProfile.goals,
               preferences: request.requirementProfile.preferences,
-              extractionConfidence: request.requirementProfile.extractionConfidence
+              extractionConfidence: request.requirementProfile
+                .extractionConfidence
                 ? Number(request.requirementProfile.extractionConfidence)
                 : null,
             }
@@ -177,7 +182,8 @@ export async function getRequestInsights(
                 paymentTerms: latestVersion.paymentTerms,
                 changeSummary: latestVersion.changeSummary,
                 equipmentDetails:
-                  (latestVersion.equipmentDetails as Record<string, unknown>) ?? null,
+                  (latestVersion.equipmentDetails as Record<string, unknown>) ??
+                  null,
               }
             : null,
         }

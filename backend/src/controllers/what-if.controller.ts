@@ -13,7 +13,10 @@ const whatIfScenarioSchema = z.object({
   budget: z.number().positive().nullable().optional(),
   batteryRequirementKwh: z.number().nonnegative().nullable().optional(),
   systemCapacityKw: z.number().positive().nullable().optional(),
-  priority: z.enum(['LOWEST_PRICE', 'BALANCED', 'QUALITY', 'RELIABILITY']).nullable().optional(),
+  priority: z
+    .enum(['LOWEST_PRICE', 'BALANCED', 'QUALITY', 'RELIABILITY'])
+    .nullable()
+    .optional(),
 })
 
 function toNumber(value: unknown): number | null {
@@ -126,11 +129,22 @@ export async function runWhatIfScenario(
       const version = bid.versions[0] ?? null
       const currentPrice = version ? toNumber(version.totalPrice) : null
       const currentCapacity = version ? toNumber(version.panelCapacityKw) : null
-      const currentBattery = version ? toNumber(version.batteryCapacityKwh) : null
+      const currentBattery = version
+        ? toNumber(version.batteryCapacityKwh)
+        : null
 
-      const budgetFeasible = hypotheticalBudget === null || currentPrice === null || hypotheticalBudget >= currentPrice
-      const capacityFit = hypotheticalCapacity === null || currentCapacity === null || currentCapacity >= hypotheticalCapacity
-      const batteryFit = hypotheticalBattery === null || currentBattery === null || currentBattery >= hypotheticalBattery
+      const budgetFeasible =
+        hypotheticalBudget === null ||
+        currentPrice === null ||
+        hypotheticalBudget >= currentPrice
+      const capacityFit =
+        hypotheticalCapacity === null ||
+        currentCapacity === null ||
+        currentCapacity >= hypotheticalCapacity
+      const batteryFit =
+        hypotheticalBattery === null ||
+        currentBattery === null ||
+        currentBattery >= hypotheticalBattery
 
       return {
         bidId: bid.id,
@@ -146,12 +160,15 @@ export async function runWhatIfScenario(
     })
 
     const proposalCount = affectedProposals.length
-    const feasibleCount = affectedProposals.filter((proposal) => proposal.requirementFit).length
+    const feasibleCount = affectedProposals.filter(
+      (proposal) => proposal.requirementFit,
+    ).length
 
     if (!request.bids[0]?.versions[0]?.id) {
       return res.status(400).json({
         success: false,
-        message: 'No bid version is available to evaluate the hypothetical scenario.',
+        message:
+          'No bid version is available to evaluate the hypothetical scenario.',
       })
     }
 
@@ -164,7 +181,8 @@ export async function runWhatIfScenario(
         hypotheticalBudget,
         currentPriority: basePriority,
         hypotheticalPriority: normalizePriority(hypotheticalPriority),
-        currentBatteryRequirement: request.requirementProfile?.backupRequired ?? false,
+        currentBatteryRequirement:
+          request.requirementProfile?.backupRequired ?? false,
         hypotheticalBatteryRequirement: hypotheticalBattery,
         currentSystemCapacityKw: null,
         hypotheticalSystemCapacityKw: hypotheticalCapacity,
@@ -179,24 +197,43 @@ export async function runWhatIfScenario(
       feasibility: {
         totalProposals: proposalCount,
         feasibleProposals: feasibleCount,
-        budgetDelta: hypotheticalBudget !== null && baseBudget !== null ? hypotheticalBudget - baseBudget : null,
+        budgetDelta:
+          hypotheticalBudget !== null && baseBudget !== null
+            ? hypotheticalBudget - baseBudget
+            : null,
         canFitScenario: feasibleCount > 0,
       },
       warnings: [
-        hypotheticalBudget !== null && baseBudget !== null && hypotheticalBudget < baseBudget
+        hypotheticalBudget !== null &&
+        baseBudget !== null &&
+        hypotheticalBudget < baseBudget
           ? 'The hypothetical budget is lower than the request budget and may reduce feasibility.'
           : null,
-        hypotheticalCapacity !== null && affectedProposals.some((proposal) => proposal.currentCapacity !== null && proposal.currentCapacity < hypotheticalCapacity)
+        hypotheticalCapacity !== null &&
+        affectedProposals.some(
+          (proposal) =>
+            proposal.currentCapacity !== null &&
+            proposal.currentCapacity < hypotheticalCapacity,
+        )
           ? 'Some proposals may not meet the hypothetical capacity target.'
           : null,
-        hypotheticalBattery !== null && affectedProposals.some((proposal) => proposal.currentBattery !== null && proposal.currentBattery < hypotheticalBattery)
+        hypotheticalBattery !== null &&
+        affectedProposals.some(
+          (proposal) =>
+            proposal.currentBattery !== null &&
+            proposal.currentBattery < hypotheticalBattery,
+        )
           ? 'Some proposals may not meet the hypothetical battery target.'
           : null,
       ].filter(Boolean),
       isHypothetical: true,
     }
 
-    let scenarioRecord: { id: string; requestId: string; createdAt: Date } | null = null
+    let scenarioRecord: {
+      id: string
+      requestId: string
+      createdAt: Date
+    } | null = null
 
     try {
       const createdScenario = await prisma.whatIfScenario.create({

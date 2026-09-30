@@ -2,6 +2,10 @@ import type { Response } from 'express'
 
 import type { AuthenticatedRequest } from '../middleware/auth.middleware.js'
 import { prisma } from '../config/prisma.js'
+import {
+  calculateCriterionScore,
+  calculateTco,
+} from '../services/evaluation-calculation.js'
 
 type CriterionScoreMap = Record<string, number>
 
@@ -22,124 +26,6 @@ function getRequestId(req: AuthenticatedRequest): string | null {
   }
 
   return value
-}
-
-function normalize(
-  value: number,
-  min: number,
-  max: number,
-): number {
-  if (max === min) {
-    return 100
-  }
-
-  return ((value - min) / (max - min)) * 100
-}
-
-function inverseNormalize(
-  value: number,
-  min: number,
-  max: number,
-): number {
-  if (max === min) {
-    return 100
-  }
-
-  return ((max - value) / (max - min)) * 100
-}
-
-function calculateTco(version: {
-  totalPrice: unknown
-  maintenanceCost: unknown
-}): number {
-  const totalPrice = Number(version.totalPrice ?? 0)
-  const maintenanceCost = Number(version.maintenanceCost ?? 0)
-
-  return totalPrice + maintenanceCost
-}
-
-function calculateCriterionScore(
-  criterion: string,
-  version: {
-    totalPrice: unknown
-    maintenanceCost: unknown
-    panelCapacityKw: unknown
-    inverterSpec: unknown
-    equipmentDetails: unknown
-    warrantyYears: unknown
-    deliveryTimeDays: unknown
-    paymentTerms: unknown
-  },
-  allVersions: typeof version[],
-): number {
-  switch (criterion) {
-    case 'PRICE': {
-      const values = allVersions.map(calculateTco)
-
-      return inverseNormalize(
-        calculateTco(version),
-        Math.min(...values),
-        Math.max(...values),
-      )
-    }
-
-    case 'TECHNICAL_COMPLIANCE': {
-      const checks = [
-        Number(version.panelCapacityKw ?? 0) > 0,
-        Boolean(version.inverterSpec),
-        Boolean(version.equipmentDetails),
-      ]
-
-      const passed = checks.filter(Boolean).length
-
-      return (passed / checks.length) * 100
-    }
-
-    case 'WARRANTY': {
-      const values = allVersions.map((item) =>
-        Number(item.warrantyYears ?? 0),
-      )
-
-      return normalize(
-        Number(version.warrantyYears ?? 0),
-        Math.min(...values),
-        Math.max(...values),
-      )
-    }
-
-    case 'DELIVERY': {
-      const values = allVersions.map((item) =>
-        Number(item.deliveryTimeDays ?? 0),
-      )
-
-      return inverseNormalize(
-        Number(version.deliveryTimeDays ?? 0),
-        Math.min(...values),
-        Math.max(...values),
-      )
-    }
-
-    case 'MAINTENANCE': {
-      const values = allVersions.map((item) =>
-        Number(item.maintenanceCost ?? 0),
-      )
-
-      return inverseNormalize(
-        Number(version.maintenanceCost ?? 0),
-        Math.min(...values),
-        Math.max(...values),
-      )
-    }
-
-    case 'PAYMENT_TERMS':
-      return version.paymentTerms ? 100 : 50
-
-    case 'CUSTOM':
-      return 50
-
-    default:
-      return 0
-  }
 }
 
 export async function setEvaluationCriteria(
@@ -210,19 +96,17 @@ export async function setEvaluationCriteria(
       'CUSTOM',
     ]
 
-    const parsedCriteria = criteria.map(
-      (criterion: unknown) => {
-        const item = criterion as {
-          name?: unknown
-          weightPercent?: unknown
-        }
+    const parsedCriteria = criteria.map((criterion: unknown) => {
+      const item = criterion as {
+        name?: unknown
+        weightPercent?: unknown
+      }
 
-        return {
-          name: String(item.name ?? ''),
-          weightPercent: Number(item.weightPercent),
-        }
-      },
-    )
+      return {
+        name: String(item.name ?? ''),
+        weightPercent: Number(item.weightPercent),
+      }
+    })
 
     const hasInvalidCriterion = parsedCriteria.some(
       (criterion) =>
@@ -239,8 +123,7 @@ export async function setEvaluationCriteria(
     }
 
     const totalWeight = parsedCriteria.reduce(
-      (sum, criterion) =>
-        sum + criterion.weightPercent,
+      (sum, criterion) => sum + criterion.weightPercent,
       0,
     )
 
@@ -259,8 +142,7 @@ export async function setEvaluationCriteria(
     if (uniqueNames.size !== parsedCriteria.length) {
       return res.status(400).json({
         success: false,
-        message:
-          'Each evaluation criterion can only appear once',
+        message: 'Each evaluation criterion can only appear once',
       })
     }
 
@@ -299,15 +181,14 @@ export async function setEvaluationCriteria(
       })
     })
 
-    const savedCriteria =
-      await prisma.evaluationCriterion.findMany({
-        where: {
-          requestId,
-        },
-        orderBy: {
-          name: 'asc',
-        },
-      })
+    const savedCriteria = await prisma.evaluationCriterion.findMany({
+      where: {
+        requestId,
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    })
 
     return res.status(200).json({
       success: true,
@@ -324,10 +205,7 @@ export async function setEvaluationCriteria(
   }
 }
 
-export async function runEvaluation(
-  req: AuthenticatedRequest,
-  res: Response,
-) {
+export async function runEvaluation(req: AuthenticatedRequest, res: Response) {
   try {
     const userId = req.user?.userId
     const requestId = getRequestId(req)
@@ -391,17 +269,22 @@ export async function runEvaluation(
       })
     }
 
+    if (request.status !== 'OPEN' && request.status !== 'EVALUATING') {
+      return res.status(409).json({
+        success: false,
+        message: 'Only open requests can be evaluated',
+      })
+    }
+
     if (request.evaluationCriteria.length === 0) {
       return res.status(400).json({
         success: false,
-        message:
-          'Set evaluation criteria before running evaluation',
+        message: 'Set evaluation criteria before running evaluation',
       })
     }
 
     const totalWeight = request.evaluationCriteria.reduce(
-      (sum, criterion) =>
-        sum + Number(criterion.weightPercent),
+      (sum, criterion) => sum + Number(criterion.weightPercent),
       0,
     )
 
@@ -431,54 +314,45 @@ export async function runEvaluation(
       })
     }
 
-    const calculations: EvaluationCalculation[] =
-      versions.map((version) => {
-        const criterionScores: CriterionScoreMap = {}
+    const calculations: EvaluationCalculation[] = versions.map((version) => {
+      const criterionScores: CriterionScoreMap = {}
 
-        for (const criterion of request.evaluationCriteria) {
-          criterionScores[criterion.name] =
-            calculateCriterionScore(
-              criterion.name,
-              version,
-              versions,
-            )
-        }
+      for (const criterion of request.evaluationCriteria) {
+        criterionScores[criterion.name] = calculateCriterionScore(
+          criterion.name,
+          version,
+          versions,
+        )
+      }
 
-        const weightedTotalScore =
-          request.evaluationCriteria.reduce(
-            (total, criterion) => {
-              const score =
-                criterionScores[criterion.name] ?? 0
+      const weightedTotalScore = request.evaluationCriteria.reduce(
+        (total, criterion) => {
+          const score = criterionScores[criterion.name] ?? 0
 
-              const weight =
-                Number(criterion.weightPercent) / 100
+          const weight = Number(criterion.weightPercent) / 100
 
-              return total + score * weight
-            },
-            0,
-          )
+          return total + score * weight
+        },
+        0,
+      )
 
-        const isCompliant =
-          Number(version.panelCapacityKw ?? 0) > 0 &&
-          Number(version.totalPrice ?? 0) > 0
+      const isCompliant =
+        Number(version.panelCapacityKw ?? 0) > 0 &&
+        Number(version.totalPrice ?? 0) > 0
 
-        return {
-          bidVersionId: version.id,
-          requestId,
-          tcoAmount: calculateTco(version),
-          criterionScores,
-          weightedTotalScore,
-          isCompliant,
-        }
-      })
+      return {
+        bidVersionId: version.id,
+        requestId,
+        tcoAmount: calculateTco(version),
+        criterionScores,
+        weightedTotalScore,
+        isCompliant,
+      }
+    })
 
     const compliantResults = calculations
       .filter((result) => result.isCompliant)
-      .sort(
-        (a, b) =>
-          b.weightedTotalScore -
-          a.weightedTotalScore,
-      )
+      .sort((a, b) => b.weightedTotalScore - a.weightedTotalScore)
 
     const rankMap = new Map<string, number>()
 
@@ -500,8 +374,7 @@ export async function runEvaluation(
             requestId: result.requestId,
             tcoAmount: result.tcoAmount,
             criterionScores: result.criterionScores,
-            weightedTotalScore:
-              result.weightedTotalScore,
+            weightedTotalScore: result.weightedTotalScore,
             rank: rankMap.get(result.bidVersionId) ?? 0,
             isCompliant: result.isCompliant,
           },
@@ -530,20 +403,19 @@ export async function runEvaluation(
       })
     })
 
-    const savedResults =
-      await prisma.evaluationResult.findMany({
-        where: {
-          requestId,
+    const savedResults = await prisma.evaluationResult.findMany({
+      where: {
+        requestId,
+      },
+      orderBy: [
+        {
+          rank: 'asc',
         },
-        orderBy: [
-          {
-            rank: 'asc',
-          },
-          {
-            weightedTotalScore: 'desc',
-          },
-        ],
-      })
+        {
+          weightedTotalScore: 'desc',
+        },
+      ],
+    })
 
     return res.status(200).json({
       success: true,
@@ -560,10 +432,7 @@ export async function runEvaluation(
   }
 }
 
-export async function getEvaluation(
-  req: AuthenticatedRequest,
-  res: Response,
-) {
+export async function getEvaluation(req: AuthenticatedRequest, res: Response) {
   try {
     const userId = req.user?.userId
     const requestId = getRequestId(req)
@@ -609,31 +478,30 @@ export async function getEvaluation(
       })
     }
 
-    const results =
-      await prisma.evaluationResult.findMany({
-        where: {
-          requestId,
-        },
-        include: {
-          bidVersion: {
-            include: {
-              bid: {
-                include: {
-                  supplier: true,
-                },
+    const results = await prisma.evaluationResult.findMany({
+      where: {
+        requestId,
+      },
+      include: {
+        bidVersion: {
+          include: {
+            bid: {
+              include: {
+                supplier: true,
               },
             },
           },
         },
-        orderBy: [
-          {
-            rank: 'asc',
-          },
-          {
-            weightedTotalScore: 'desc',
-          },
-        ],
-      })
+      },
+      orderBy: [
+        {
+          rank: 'asc',
+        },
+        {
+          weightedTotalScore: 'desc',
+        },
+      ],
+    })
 
     return res.status(200).json({
       success: true,

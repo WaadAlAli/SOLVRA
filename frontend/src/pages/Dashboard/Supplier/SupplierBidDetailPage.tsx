@@ -52,9 +52,7 @@ function SupplierBidDetailPage() {
         setBid(response.bid)
       } catch (err) {
         setError(
-          err instanceof Error
-            ? err.message
-            : 'Unable to load bid details.',
+          err instanceof Error ? err.message : 'Unable to load bid details.',
         )
       } finally {
         setLoading(false)
@@ -106,10 +104,7 @@ function SupplierBidDetailPage() {
                   </p>
 
                   <div className="mt-3 flex items-center gap-2 text-sm text-[var(--text-secondary)]">
-                    <MapPin
-                      size={15}
-                      className="text-[var(--copper)]"
-                    />
+                    <MapPin size={15} className="text-[var(--copper)]" />
                     {bid.request.location}
                   </div>
                 </div>
@@ -152,30 +147,22 @@ function SupplierBidDetailPage() {
               <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 <InfoCard
                   label="Panel capacity"
-                  value={formatValue(
-                    bid.latestVersion.panelCapacityKw,
-                  )}
+                  value={formatValue(bid.latestVersion.panelCapacityKw)}
                 />
 
                 <InfoCard
                   label="Battery capacity"
-                  value={formatValue(
-                    bid.latestVersion.batteryCapacityKwh,
-                  )}
+                  value={formatValue(bid.latestVersion.batteryCapacityKwh)}
                 />
 
                 <InfoCard
                   label="Warranty"
-                  value={formatValue(
-                    bid.latestVersion.warrantyYears,
-                  )}
+                  value={formatValue(bid.latestVersion.warrantyYears)}
                 />
 
                 <InfoCard
                   label="Delivery"
-                  value={formatValue(
-                    bid.latestVersion.deliveryTimeDays,
-                  )}
+                  value={formatValue(bid.latestVersion.deliveryTimeDays)}
                 />
               </section>
             )}
@@ -183,71 +170,50 @@ function SupplierBidDetailPage() {
             {bid.latestVersion && (
               <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] p-5">
                 <div className="flex items-center gap-3">
-                  <Sparkles
-                    size={16}
-                    className="text-[var(--copper)]"
-                  />
+                  <Sparkles size={16} className="text-[var(--copper)]" />
 
-                  <h2 className="text-lg font-semibold">
-                    Proposal details
-                  </h2>
+                  <h2 className="text-lg font-semibold">Proposal details</h2>
                 </div>
 
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   <DetailRow
                     label="Installation cost"
-                    value={formatValue(
-                      bid.latestVersion.installationCost,
-                    )}
+                    value={formatValue(bid.latestVersion.installationCost)}
                   />
 
                   <DetailRow
                     label="Delivery cost"
-                    value={formatValue(
-                      bid.latestVersion.deliveryCost,
-                    )}
+                    value={formatValue(bid.latestVersion.deliveryCost)}
                   />
 
                   <DetailRow
                     label="Commissioning cost"
-                    value={formatValue(
-                      bid.latestVersion.commissioningCost,
-                    )}
+                    value={formatValue(bid.latestVersion.commissioningCost)}
                   />
 
                   <DetailRow
                     label="Maintenance cost"
-                    value={formatValue(
-                      bid.latestVersion.maintenanceCost,
-                    )}
+                    value={formatValue(bid.latestVersion.maintenanceCost)}
                   />
 
                   <DetailRow
                     label="Payment terms"
-                    value={formatValue(
-                      bid.latestVersion.paymentTerms,
-                    )}
+                    value={formatValue(bid.latestVersion.paymentTerms)}
                   />
 
                   <DetailRow
                     label="Battery type"
-                    value={formatValue(
-                      bid.latestVersion.batteryType,
-                    )}
+                    value={formatValue(bid.latestVersion.batteryType)}
                   />
 
                   <DetailRow
                     label="Inverter spec"
-                    value={formatValue(
-                      bid.latestVersion.inverterSpec,
-                    )}
+                    value={formatValue(bid.latestVersion.inverterSpec)}
                   />
 
                   <DetailRow
                     label="Change summary"
-                    value={formatValue(
-                      bid.latestVersion.changeSummary,
-                    )}
+                    value={formatValue(bid.latestVersion.changeSummary)}
                   />
                 </div>
               </section>
@@ -267,8 +233,7 @@ function SupplierBidDetailPage() {
 
                 <div className="mt-4 space-y-3">
                   {bid.versions.map((version) => {
-                    const isLatest =
-                      version.id === bid.latestVersion?.id
+                    const isLatest = version.id === bid.latestVersion?.id
 
                     return (
                       <div
@@ -321,33 +286,19 @@ function SupplierBidDetailPage() {
   )
 }
 
-function InfoCard({
-  label,
-  value,
-}: {
-  label: string
-  value: string
-}) {
+function InfoCard({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] p-4">
       <p className="text-[9px] uppercase tracking-[0.16em] text-[var(--text-muted)]">
         {label}
       </p>
 
-      <p className="mt-3 text-lg font-semibold">
-        {value}
-      </p>
+      <p className="mt-3 text-lg font-semibold">{value}</p>
     </div>
   )
 }
 
-function DetailRow({
-  label,
-  value,
-}: {
-  label: string
-  value: string
-}) {
+function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] p-3">
       <p className="text-[9px] uppercase tracking-[0.14em] text-[var(--text-muted)]">
@@ -362,4 +313,3 @@ function DetailRow({
 }
 
 export default SupplierBidDetailPage
-

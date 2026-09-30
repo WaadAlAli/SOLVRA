@@ -12,16 +12,11 @@ const bidIdParamSchema = z.object({
   bidId: z.string().uuid('Bid ID is invalid'),
 })
 
-export async function getRequestBids(
-  req: AuthenticatedRequest,
-  res: Response,
-) {
+export async function getRequestBids(req: AuthenticatedRequest, res: Response) {
   try {
     const userId = req.user?.userId
     const paramResult = requestIdParamSchema.safeParse({
-      id: Array.isArray(req.params.id)
-        ? req.params.id[0]
-        : req.params.id,
+      id: Array.isArray(req.params.id) ? req.params.id[0] : req.params.id,
     })
 
     if (!paramResult.success) {
@@ -120,9 +115,7 @@ export async function getRequestBidById(
   try {
     const userId = req.user?.userId
     const requestParamResult = requestIdParamSchema.safeParse({
-      id: Array.isArray(req.params.id)
-        ? req.params.id[0]
-        : req.params.id,
+      id: Array.isArray(req.params.id) ? req.params.id[0] : req.params.id,
     })
     const bidParamResult = bidIdParamSchema.safeParse({
       bidId: Array.isArray(req.params.bidId)

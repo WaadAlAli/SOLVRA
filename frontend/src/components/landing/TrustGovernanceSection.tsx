@@ -145,9 +145,7 @@ function TrustGovernanceSection() {
                 <div key={stage.number}>
                   <div
                     className={`group relative grid gap-5 rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--border-strong)] sm:p-6 md:grid-cols-[56px_180px_1fr] md:items-center md:gap-7 ${
-                      stage.ai
-                        ? 'border-[#00E5FF]/15'
-                        : ''
+                      stage.ai ? 'border-[#00E5FF]/15' : ''
                     }`}
                   >
                     {/* Number */}
@@ -161,9 +159,7 @@ function TrustGovernanceSection() {
                     <div className="flex items-center gap-3">
                       <div
                         className={`flex h-9 w-9 items-center justify-center rounded-lg ${
-                          stage.ai
-                            ? 'bg-[#00E5FF]/10'
-                            : 'bg-[#D47A3A]/10'
+                          stage.ai ? 'bg-[#00E5FF]/10' : 'bg-[#D47A3A]/10'
                         }`}
                       >
                         <Icon

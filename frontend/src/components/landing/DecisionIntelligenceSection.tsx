@@ -79,16 +79,16 @@ function DecisionIntelligenceSection() {
         <div className="grid gap-10 lg:grid-cols-[0.65fr_1.35fr] lg:gap-24">
           <div>
             <div className="flex items-center gap-3">
-  <span className="text-[10px] font-bold tracking-[0.18em] text-[var(--text-muted)]">
-    04
-  </span>
+              <span className="text-[10px] font-bold tracking-[0.18em] text-[var(--text-muted)]">
+                04
+              </span>
 
-  <span className="h-px w-8 bg-[var(--border)]" />
+              <span className="h-px w-8 bg-[var(--border)]" />
 
-  <p className="text-xs font-bold tracking-[0.18em] text-[#D47A3A]">
-    DECISION INTELLIGENCE
-  </p>
-</div>
+              <p className="text-xs font-bold tracking-[0.18em] text-[#D47A3A]">
+                DECISION INTELLIGENCE
+              </p>
+            </div>
 
             <div className="mt-5 h-px w-16 bg-[#D47A3A]" />
 
@@ -108,8 +108,8 @@ function DecisionIntelligenceSection() {
 
             <p className="mt-7 max-w-2xl text-base leading-7 text-[var(--text-secondary)] sm:text-lg sm:leading-8">
               SOLVRA transforms different supplier proposals into a structured
-              evaluation environment where technical, commercial, and
-              decision criteria can be reviewed together.
+              evaluation environment where technical, commercial, and decision
+              criteria can be reviewed together.
             </p>
           </div>
         </div>

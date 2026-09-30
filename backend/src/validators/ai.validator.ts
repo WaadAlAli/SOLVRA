@@ -3,64 +3,32 @@ import { z } from 'zod'
 export const requirementExtractionSchema = z.object({
   hasRelevantAdditionalInfo: z.boolean(),
 
-  relevanceReason: z
-    .string()
-    .trim()
-    .min(1)
-    .max(300),
+  relevanceReason: z.string().trim().min(1).max(300),
 
-  occupantsOrUsers: z
-    .number()
-    .int()
-    .nonnegative()
-    .nullable(),
+  occupantsOrUsers: z.number().int().nonnegative().nullable(),
 
-  acUnitsCount: z
-    .number()
-    .int()
-    .nonnegative()
-    .nullable(),
+  acUnitsCount: z.number().int().nonnegative().nullable(),
 
-  applianceLoad: z
-    .record(z.string(), z.unknown())
-    .nullable(),
+  applianceLoad: z.record(z.string(), z.unknown()).nullable(),
 
-  usagePattern: z
-    .record(z.string(), z.unknown())
-    .nullable(),
+  usagePattern: z.record(z.string(), z.unknown()).nullable(),
 
   backupRequired: z.boolean(),
 
-  currentElectricitySituation: z
-    .string()
-    .trim()
-    .max(500)
-    .nullable(),
+  currentElectricitySituation: z.string().trim().max(500).nullable(),
 
-  goals: z
-    .array(z.string().trim().min(1).max(200)),
+  goals: z.array(z.string().trim().min(1).max(200)),
 
-  preferences: z
-    .string()
-    .trim()
-    .max(500)
-    .nullable(),
+  preferences: z.string().trim().max(500).nullable(),
 
-  extractionConfidence: z
-    .number()
-    .min(0)
-    .max(1),
+  extractionConfidence: z.number().min(0).max(1),
 
-  missingInformation: z
-    .array(z.string().trim().min(1).max(200)),
+  missingInformation: z.array(z.string().trim().min(1).max(200)),
 
-  conflicts: z
-    .array(z.string().trim().min(1).max(300)),
+  conflicts: z.array(z.string().trim().min(1).max(300)),
 })
 
-export type RequirementExtraction = z.infer<
-  typeof requirementExtractionSchema
->
+export type RequirementExtraction = z.infer<typeof requirementExtractionSchema>
 
 export const insightsAnalysisSchema = z.object({
   summary: z.string().trim().min(1).max(2000),
@@ -102,6 +70,4 @@ export const insightsAnalysisSchema = z.object({
   requiresConfirmation: z.boolean(),
 })
 
-export type InsightsAnalysis = z.infer<
-  typeof insightsAnalysisSchema
->
+export type InsightsAnalysis = z.infer<typeof insightsAnalysisSchema>

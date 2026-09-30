@@ -7,9 +7,6 @@ const router = Router()
 
 router.use(authenticate)
 
-router.post(
-  '/requests/:requestId',
-  awardBid,
-)
+router.post('/requests/:requestId', awardBid)
 
 export default router

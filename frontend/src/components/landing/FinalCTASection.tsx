@@ -55,7 +55,6 @@ function FinalCTASection() {
             className="group inline-flex items-center justify-center gap-2 rounded-xl bg-[#D47A3A] px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#D47A3A]/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#BD6830] hover:shadow-xl hover:shadow-[#D47A3A]/25"
           >
             Start a Solar Request
-
             <ArrowUpRight
               size={16}
               className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"

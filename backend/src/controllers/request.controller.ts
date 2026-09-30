@@ -4,7 +4,10 @@ import { z } from 'zod'
 import type { AuthenticatedRequest } from '../middleware/auth.middleware.js'
 
 import { prisma } from '../config/prisma.js'
-import { createRequestSchema ,updateRequestSchema } from '../validators/request.validator.js'
+import {
+  createRequestSchema,
+  updateRequestSchema,
+} from '../validators/request.validator.js'
 
 const requestIdParamSchema = z.object({
   id: z.string().uuid('Request ID is invalid'),
@@ -14,11 +17,7 @@ const bidIdParamSchema = z.object({
   bidId: z.string().uuid('Bid ID is invalid'),
 })
 
-
-export async function createRequest(
-  req: AuthenticatedRequest,
-  res: Response,
-){
+export async function createRequest(req: AuthenticatedRequest, res: Response) {
   try {
     const validation = createRequestSchema.safeParse(req.body)
 
@@ -54,8 +53,14 @@ export async function createRequest(
       })
     }
 
-    const budget =
-      data.budgetMax ?? data.budgetMin
+    if (data.status !== 'DRAFT') {
+      return res.status(400).json({
+        success: false,
+        message: 'Requests must be opened after requirements are confirmed',
+      })
+    }
+
+    const budget = data.budgetMax ?? data.budgetMin
 
     const request = await prisma.solarRequest.create({
       data: {
@@ -72,11 +77,9 @@ export async function createRequest(
 
         rawDescription: data.rawDescription,
 
-        monthlyElectricityBill:
-          data.monthlyElectricityBill,
+        monthlyElectricityBill: data.monthlyElectricityBill,
 
-        averageMonthlyConsumption:
-          data.averageMonthlyConsumption,
+        averageMonthlyConsumption: data.averageMonthlyConsumption,
 
         roofType: data.roofType,
         ownership: data.ownership,
@@ -101,10 +104,7 @@ export async function createRequest(
 
     return res.status(201).json({
       success: true,
-      message:
-        data.status === 'OPEN'
-          ? 'Solar request opened successfully'
-          : 'Solar request saved as draft',
+      message: 'Solar request saved as draft',
       request,
     })
   } catch (error) {
@@ -117,10 +117,7 @@ export async function createRequest(
   }
 }
 
-export async function getMyRequests(
-  req: AuthenticatedRequest,
-  res: Response,
-) {
+export async function getMyRequests(req: AuthenticatedRequest, res: Response) {
   try {
     const userId = req.user?.userId
 
@@ -131,12 +128,11 @@ export async function getMyRequests(
       })
     }
 
-    const buyerProfile =
-      await prisma.buyerProfile.findUnique({
-        where: {
-          userId,
-        },
-      })
+    const buyerProfile = await prisma.buyerProfile.findUnique({
+      where: {
+        userId,
+      },
+    })
 
     if (!buyerProfile) {
       return res.status(403).json({
@@ -145,25 +141,24 @@ export async function getMyRequests(
       })
     }
 
-    const requests =
-      await prisma.solarRequest.findMany({
-        where: {
-          buyerId: buyerProfile.id,
-        },
+    const requests = await prisma.solarRequest.findMany({
+      where: {
+        buyerId: buyerProfile.id,
+      },
 
-        orderBy: {
-          createdAt: 'desc',
-        },
+      orderBy: {
+        createdAt: 'desc',
+      },
 
-        include: {
-          requirementProfile: true,
-          _count: {
-            select: {
-              bids: true,
-            },
+      include: {
+        requirementProfile: true,
+        _count: {
+          select: {
+            bids: true,
           },
         },
-      })
+      },
+    })
 
     return res.status(200).json({
       success: true,
@@ -179,15 +174,10 @@ export async function getMyRequests(
   }
 }
 
-export async function getRequestById(
-  req: AuthenticatedRequest,
-  res: Response,
-) {
+export async function getRequestById(req: AuthenticatedRequest, res: Response) {
   try {
     const userId = req.user?.userId
-    const id = Array.isArray(req.params.id)
-  ? req.params.id[0]
-  : req.params.id
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id
 
     if (!userId) {
       return res.status(401).json({
@@ -196,12 +186,11 @@ export async function getRequestById(
       })
     }
 
-    const buyerProfile =
-      await prisma.buyerProfile.findUnique({
-        where: {
-          userId,
-        },
-      })
+    const buyerProfile = await prisma.buyerProfile.findUnique({
+      where: {
+        userId,
+      },
+    })
 
     if (!buyerProfile) {
       return res.status(403).json({
@@ -210,30 +199,29 @@ export async function getRequestById(
       })
     }
 
-    const request =
-      await prisma.solarRequest.findFirst({
-        where: {
-          id,
-          buyerId: buyerProfile.id,
-        },
+    const request = await prisma.solarRequest.findFirst({
+      where: {
+        id,
+        buyerId: buyerProfile.id,
+      },
 
-        include: {
-          requirementProfile: true,
-          bids: {
-            include: {
-              supplier: true,
-              versions: true,
-            },
-          },
-          evaluationCriteria: true,
-          evaluationResults: true,
-          activityLogs: {
-            orderBy: {
-              createdAt: 'desc',
-            },
+      include: {
+        requirementProfile: true,
+        bids: {
+          include: {
+            supplier: true,
+            versions: true,
           },
         },
-      })
+        evaluationCriteria: true,
+        evaluationResults: true,
+        activityLogs: {
+          orderBy: {
+            createdAt: 'desc',
+          },
+        },
+      },
+    })
 
     if (!request) {
       return res.status(404).json({
@@ -256,16 +244,11 @@ export async function getRequestById(
   }
 }
 
-export async function getRequestBids(
-  req: AuthenticatedRequest,
-  res: Response,
-) {
+export async function getRequestBids(req: AuthenticatedRequest, res: Response) {
   try {
     const userId = req.user?.userId
     const paramResult = requestIdParamSchema.safeParse({
-      id: Array.isArray(req.params.id)
-        ? req.params.id[0]
-        : req.params.id,
+      id: Array.isArray(req.params.id) ? req.params.id[0] : req.params.id,
     })
 
     if (!paramResult.success) {
@@ -364,9 +347,7 @@ export async function getRequestBidById(
   try {
     const userId = req.user?.userId
     const requestParamResult = requestIdParamSchema.safeParse({
-      id: Array.isArray(req.params.id)
-        ? req.params.id[0]
-        : req.params.id,
+      id: Array.isArray(req.params.id) ? req.params.id[0] : req.params.id,
     })
     const bidParamResult = bidIdParamSchema.safeParse({
       bidId: Array.isArray(req.params.bidId)
@@ -479,16 +460,11 @@ export async function getRequestBidById(
   }
 }
 
-export async function updateRequest(
-  req: AuthenticatedRequest,
-  res: Response,
-) {
+export async function updateRequest(req: AuthenticatedRequest, res: Response) {
   try {
     const userId = req.user?.userId
 
-    const id = Array.isArray(req.params.id)
-      ? req.params.id[0]
-      : req.params.id
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id
 
     if (!id) {
       return res.status(400).json({
@@ -573,13 +549,11 @@ export async function updateRequest(
         }),
 
         ...(data.monthlyElectricityBill !== undefined && {
-          monthlyElectricityBill:
-            data.monthlyElectricityBill,
+          monthlyElectricityBill: data.monthlyElectricityBill,
         }),
 
         ...(data.averageMonthlyConsumption !== undefined && {
-          averageMonthlyConsumption:
-            data.averageMonthlyConsumption,
+          averageMonthlyConsumption: data.averageMonthlyConsumption,
         }),
 
         ...(data.roofType !== undefined && {
@@ -634,16 +608,11 @@ export async function updateRequest(
   }
 }
 
-export async function deleteRequest(
-  req: AuthenticatedRequest,
-  res: Response,
-) {
+export async function deleteRequest(req: AuthenticatedRequest, res: Response) {
   try {
     const userId = req.user?.userId
 
-    const id = Array.isArray(req.params.id)
-      ? req.params.id[0]
-      : req.params.id
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id
 
     if (!id) {
       return res.status(400).json({
@@ -708,16 +677,11 @@ export async function deleteRequest(
     })
   }
 }
-export async function openRequest(
-  req: AuthenticatedRequest,
-  res: Response,
-) {
+export async function openRequest(req: AuthenticatedRequest, res: Response) {
   try {
     const userId = req.user?.userId
 
-    const id = Array.isArray(req.params.id)
-      ? req.params.id[0]
-      : req.params.id
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id
 
     if (!id) {
       return res.status(400).json({
@@ -778,7 +742,8 @@ export async function openRequest(
     if (!request.requirementProfile.confirmedByBuyer) {
       return res.status(400).json({
         success: false,
-        message: 'Please confirm the AI requirements before opening the request',
+        message:
+          'Please confirm the AI requirements before opening the request',
       })
     }
 

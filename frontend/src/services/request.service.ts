@@ -4,43 +4,25 @@ import type { SolarRequestForm } from '../types/request'
 
 export interface CreateRequestInput {
   title: string
-  propertyType: Exclude<
-    SolarRequestForm['propertyType'],
-    ''
-  >
+  propertyType: Exclude<SolarRequestForm['propertyType'], ''>
   location: string
   rawDescription: string
 
-  currency?: Exclude<
-    SolarRequestForm['currency'],
-    ''
-  >
+  currency?: Exclude<SolarRequestForm['currency'], ''>
 
   monthlyElectricityBill?: number
   averageMonthlyConsumption?: number
 
-  roofType?: Exclude<
-    SolarRequestForm['roofType'],
-    ''
-  >
+  roofType?: Exclude<SolarRequestForm['roofType'], ''>
 
-  ownership?: Exclude<
-    SolarRequestForm['ownership'],
-    ''
-  >
+  ownership?: Exclude<SolarRequestForm['ownership'], ''>
 
   budgetMin?: number
   budgetMax?: number
 
-  priority?: Exclude<
-    SolarRequestForm['priority'],
-    ''
-  >
+  priority?: Exclude<SolarRequestForm['priority'], ''>
 
-  timeline?: Exclude<
-    SolarRequestForm['targetTimeline'],
-    ''
-  >
+  timeline?: Exclude<SolarRequestForm['targetTimeline'], ''>
 }
 
 export interface SolarRequest {
@@ -53,14 +35,8 @@ export interface SolarRequest {
   budget: string | number | null
   currency: string | null
   rawDescription: string
-  monthlyElectricityBill:
-    | string
-    | number
-    | null
-  averageMonthlyConsumption:
-    | string
-    | number
-    | null
+  monthlyElectricityBill: string | number | null
+  averageMonthlyConsumption: string | number | null
   roofType: string | null
   ownership: string | null
   priority: string | null
@@ -218,18 +194,13 @@ export interface GetRequestBidsResponse {
 export async function createRequest(
   input: CreateRequestInput,
 ): Promise<CreateRequestResponse> {
-  const response = await api.post<CreateRequestResponse>(
-    '/requests',
-    input,
-  )
+  const response = await api.post<CreateRequestResponse>('/requests', input)
 
   return response.data
 }
 
 export async function getMyRequests(): Promise<RequestsResponse> {
-  const response = await api.get<RequestsResponse>(
-    '/requests',
-  )
+  const response = await api.get<RequestsResponse>('/requests')
 
   return response.data
 }
@@ -237,9 +208,7 @@ export async function getMyRequests(): Promise<RequestsResponse> {
 export async function getRequestById(
   requestId: string,
 ): Promise<RequestResponse> {
-  const response = await api.get<RequestResponse>(
-    `/requests/${requestId}`,
-  )
+  const response = await api.get<RequestResponse>(`/requests/${requestId}`)
 
   return response.data
 }
@@ -269,10 +238,9 @@ export async function deleteRequest(
 export async function analyzeRequest(
   requestId: string,
 ): Promise<AnalyzeRequestResponse> {
-  const response =
-    await api.post<AnalyzeRequestResponse>(
-      `/requests/${requestId}/analyze`,
-    )
+  const response = await api.post<AnalyzeRequestResponse>(
+    `/requests/${requestId}/analyze`,
+  )
 
   return response.data
 }
@@ -281,18 +249,15 @@ export async function confirmRequirements(
   requestId: string,
   input: ConfirmRequirementsInput,
 ): Promise<ConfirmRequirementsResponse> {
-  const response =
-    await api.post<ConfirmRequirementsResponse>(
-      `/requests/${requestId}/requirements/confirm`,
-      input,
-    )
+  const response = await api.post<ConfirmRequirementsResponse>(
+    `/requests/${requestId}/requirements/confirm`,
+    input,
+  )
 
   return response.data
 }
 
-export async function openRequest(
-  requestId: string,
-): Promise<RequestResponse> {
+export async function openRequest(requestId: string): Promise<RequestResponse> {
   const response = await api.post<RequestResponse>(
     `/requests/${requestId}/open`,
   )

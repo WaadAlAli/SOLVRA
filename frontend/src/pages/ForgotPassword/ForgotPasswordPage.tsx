@@ -1,10 +1,5 @@
 import { useState } from 'react'
-import {
-  ArrowLeft,
-  CheckCircle2,
-  Loader2,
-  Mail,
-} from 'lucide-react'
+import { ArrowLeft, CheckCircle2, Loader2, Mail } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import AuthShell from '../../components/auth/AuthShell'
@@ -16,9 +11,7 @@ function ForgotPasswordPage() {
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
 
-  const handleSubmit = async (
-    event: React.FormEvent<HTMLFormElement>,
-  ) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     setError('')
@@ -59,22 +52,18 @@ function ForgotPasswordPage() {
             <CheckCircle2 size={21} />
           </div>
 
-          <h2 className="mt-5 text-lg font-semibold">
-            Check your email.
-          </h2>
+          <h2 className="mt-5 text-lg font-semibold">Check your email.</h2>
 
           <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
             If an account exists for{' '}
             <span className="font-medium text-[var(--text-primary)]">
               {email}
             </span>
-            , you'll receive instructions to reset your
-            password.
+            , you'll receive instructions to reset your password.
           </p>
 
           <p className="mt-4 text-xs leading-5 text-[var(--text-muted)]">
-            The reset link is valid for 30 minutes and can
-            only be used once.
+            The reset link is valid for 30 minutes and can only be used once.
           </p>
 
           <Link
@@ -85,10 +74,7 @@ function ForgotPasswordPage() {
           </Link>
         </div>
       ) : (
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-5"
-        >
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label
               htmlFor="reset-email"
@@ -131,10 +117,7 @@ function ForgotPasswordPage() {
             className="flex h-12 w-full items-center justify-center rounded-xl bg-[var(--copper)] text-sm font-semibold text-white transition hover:bg-[var(--copper-hover)] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? (
-              <Loader2
-                size={18}
-                className="animate-spin"
-              />
+              <Loader2 size={18} className="animate-spin" />
             ) : (
               'Send reset instructions'
             )}

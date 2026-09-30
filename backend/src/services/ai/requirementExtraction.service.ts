@@ -1,7 +1,5 @@
 import { hfClient } from './ai.client.js'
-import {
-  requirementExtractionSchema,
-} from '../../validators/ai.validator.js'
+import { requirementExtractionSchema } from '../../validators/ai.validator.js'
 
 const MODEL = 'openai/gpt-oss-120b'
 
@@ -19,9 +17,7 @@ interface RequirementExtractionInput {
   timeline: string | null
 }
 
-export async function extractRequirements(
-  input: RequirementExtractionInput,
-) {
+export async function extractRequirements(input: RequirementExtractionInput) {
   const {
     description,
     propertyType,
@@ -198,33 +194,31 @@ Return exactly this structure:
     max_tokens: 1200,
   })
 
- const content = response.choices[0]?.message?.content
+  const content = response?.choices?.[0]?.message?.content
 
-if (!content) {
-  throw new Error('AI returned an empty response')
-}
+  if (!content?.trim()) {
+    throw new Error('AI returned an empty response')
+  }
 
-let parsed: unknown
+  let parsed: unknown
 
-try {
-  parsed = JSON.parse(content)
-} catch {
-  console.error('AI returned invalid JSON:', content)
+  try {
+    const cleanedContent = content
+      .trim()
+      .replace(/^```json\s*/i, '')
+      .replace(/^```\s*/i, '')
+      .replace(/\s*```$/i, '')
+      .trim()
 
-  throw new Error('AI returned invalid JSON')
-}
+    parsed = JSON.parse(cleanedContent)
+  } catch {
+    throw new Error('AI returned invalid JSON')
+  }
 
-const validation = requirementExtractionSchema.safeParse(parsed)
+  const validation = requirementExtractionSchema.safeParse(parsed)
 
   if (!validation.success) {
-    console.error(
-      'AI validation error:',
-      validation.error.flatten(),
-    )
-
-    throw new Error(
-      'AI returned an invalid requirement structure',
-    )
+    throw new Error('AI returned an invalid requirement structure')
   }
 
   return validation.data

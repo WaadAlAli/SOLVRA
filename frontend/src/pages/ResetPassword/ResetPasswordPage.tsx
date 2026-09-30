@@ -9,11 +9,7 @@ import {
   LockKeyhole,
   XCircle,
 } from 'lucide-react'
-import {
-  Link,
-  useNavigate,
-  useSearchParams,
-} from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 
 import AuthShell from '../../components/auth/AuthShell'
 import { resetPassword } from '../../services/auth.service'
@@ -36,23 +32,17 @@ function ResetPasswordPage() {
 
   useEffect(() => {
     if (!token) {
-      setError(
-        'This password reset link is missing or invalid.',
-      )
+      setError('This password reset link is missing or invalid.')
     }
   }, [token])
 
-  const handleSubmit = async (
-    event: React.FormEvent<HTMLFormElement>,
-  ) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     setError('')
 
     if (!token) {
-      setError(
-        'This password reset link is missing or invalid.',
-      )
+      setError('This password reset link is missing or invalid.')
       return
     }
 
@@ -64,11 +54,7 @@ function ResetPasswordPage() {
     setLoading(true)
 
     try {
-      await resetPassword(
-        token,
-        password,
-        confirmPassword,
-      )
+      await resetPassword(token, password, confirmPassword)
 
       setSuccess(true)
     } catch (error) {
@@ -102,13 +88,11 @@ function ResetPasswordPage() {
             <CheckCircle2 size={23} />
           </div>
 
-          <h2 className="mt-5 text-lg font-semibold">
-            Access restored.
-          </h2>
+          <h2 className="mt-5 text-lg font-semibold">Access restored.</h2>
 
           <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-            Your password has been changed successfully.
-            The previous password can no longer be used.
+            Your password has been changed successfully. The previous password
+            can no longer be used.
           </p>
 
           <button
@@ -117,7 +101,6 @@ function ResetPasswordPage() {
             className="group mt-6 flex h-12 w-full items-center justify-between rounded-xl bg-[var(--copper)] px-4 text-sm font-semibold text-white transition hover:bg-[var(--copper-hover)]"
           >
             Continue to SOLVRA
-
             <ArrowRight
               size={17}
               className="transition-transform group-hover:translate-x-1"
@@ -148,13 +131,11 @@ function ResetPasswordPage() {
             <XCircle size={21} />
           </div>
 
-          <h2 className="mt-5 text-lg font-semibold">
-            Invalid reset link.
-          </h2>
+          <h2 className="mt-5 text-lg font-semibold">Invalid reset link.</h2>
 
           <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-            This page needs a valid password reset link.
-            Please request a new one.
+            This page needs a valid password reset link. Please request a new
+            one.
           </p>
 
           <Link
@@ -165,10 +146,7 @@ function ResetPasswordPage() {
           </Link>
         </div>
       ) : (
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-5"
-        >
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label
               htmlFor="new-password"
@@ -200,21 +178,11 @@ function ResetPasswordPage() {
 
               <button
                 type="button"
-                onClick={() =>
-                  setShowPassword((value) => !value)
-                }
+                onClick={() => setShowPassword((value) => !value)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
-                aria-label={
-                  showPassword
-                    ? 'Hide password'
-                    : 'Show password'
-                }
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
-                {showPassword ? (
-                  <EyeOff size={17} />
-                ) : (
-                  <Eye size={17} />
-                )}
+                {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
               </button>
             </div>
           </div>
@@ -250,33 +218,21 @@ function ResetPasswordPage() {
 
               <button
                 type="button"
-                onClick={() =>
-                  setShowConfirm((value) => !value)
-                }
+                onClick={() => setShowConfirm((value) => !value)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
-                aria-label={
-                  showConfirm
-                    ? 'Hide password'
-                    : 'Show password'
-                }
+                aria-label={showConfirm ? 'Hide password' : 'Show password'}
               >
-                {showConfirm ? (
-                  <EyeOff size={17} />
-                ) : (
-                  <Eye size={17} />
-                )}
+                {showConfirm ? <EyeOff size={17} /> : <Eye size={17} />}
               </button>
             </div>
           </div>
 
           <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] px-4 py-3">
-            <p className="text-xs font-medium">
-              Password requirements
-            </p>
+            <p className="text-xs font-medium">Password requirements</p>
 
             <p className="mt-1 text-[11px] leading-5 text-[var(--text-secondary)]">
-              At least 8 characters, including uppercase,
-              lowercase, and a number.
+              At least 8 characters, including uppercase, lowercase, and a
+              number.
             </p>
           </div>
 
@@ -295,10 +251,7 @@ function ResetPasswordPage() {
               <>
                 <span>Updating password...</span>
 
-                <Loader2
-                  size={18}
-                  className="animate-spin"
-                />
+                <Loader2 size={18} className="animate-spin" />
               </>
             ) : (
               <>

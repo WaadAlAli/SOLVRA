@@ -1,8 +1,4 @@
-import {
-  ArrowUpRight,
-  Globe,
-  Mail,
-} from 'lucide-react'
+import { ArrowUpRight, Globe, Mail } from 'lucide-react'
 
 const productLinks = [
   { label: 'How it works', href: '#how-it-works' },
@@ -26,10 +22,7 @@ function Footer() {
         <div className="grid gap-12 py-14 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-16 lg:py-16">
           {/* Brand */}
           <div>
-            <a
-              href="#"
-              className="inline-flex items-center gap-2"
-            >
+            <a href="#" className="inline-flex items-center gap-2">
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#D47A3A] text-sm font-black text-white">
                 S
               </span>
@@ -117,7 +110,6 @@ function Footer() {
                 className="group mt-4 inline-flex items-center gap-2 text-sm font-bold text-[#D47A3A]"
               >
                 Start a Solar Request
-
                 <ArrowUpRight
                   size={14}
                   className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"

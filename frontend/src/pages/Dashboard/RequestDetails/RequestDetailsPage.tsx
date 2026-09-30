@@ -70,8 +70,7 @@ function RequestDetailsPage() {
   const { requestId } = useParams<{ requestId: string }>()
   const navigate = useNavigate()
 
-  const [request, setRequest] =
-    useState<RequestDetails | null>(null)
+  const [request, setRequest] = useState<RequestDetails | null>(null)
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -91,20 +90,12 @@ function RequestDetailsPage() {
         const response = await getRequestById(requestId)
 
         if (!response.success || !response.request) {
-          throw new Error(
-            response.message || 'Unable to load request.',
-          )
+          throw new Error(response.message || 'Unable to load request.')
         }
 
-        setRequest(
-          response.request as unknown as RequestDetails,
-        )
+        setRequest(response.request as unknown as RequestDetails)
       } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : 'Unable to load request.',
-        )
+        setError(err instanceof Error ? err.message : 'Unable to load request.')
       } finally {
         setLoading(false)
       }
@@ -142,9 +133,7 @@ function RequestDetailsPage() {
               Unable to load request
             </p>
 
-            <p className="mt-2 text-sm text-[var(--text-secondary)]">
-              {error}
-            </p>
+            <p className="mt-2 text-sm text-[var(--text-secondary)]">{error}</p>
           </div>
         )}
 
@@ -225,9 +214,7 @@ function RequestDetailsPage() {
 
                 <InfoCard
                   label="Monthly consumption"
-                  value={formatValue(
-                    request.averageMonthlyConsumption,
-                  )}
+                  value={formatValue(request.averageMonthlyConsumption)}
                 />
 
                 <InfoCard
@@ -304,9 +291,7 @@ function RequestDetailsPage() {
                     <InfoCard
                       label="Backup required"
                       value={
-                        request.requirementProfile.backupRequired
-                          ? 'Yes'
-                          : 'No'
+                        request.requirementProfile.backupRequired ? 'Yes' : 'No'
                       }
                     />
 
@@ -324,10 +309,7 @@ function RequestDetailsPage() {
                           ? Object.entries(
                               request.requirementProfile.usagePattern,
                             )
-                              .map(
-                                ([key, value]) =>
-                                  `${key}: ${String(value)}`,
-                              )
+                              .map(([key, value]) => `${key}: ${String(value)}`)
                               .join(', ')
                           : 'Not specified'
                       }
@@ -336,12 +318,10 @@ function RequestDetailsPage() {
                     <InfoCard
                       label="AI confidence"
                       value={
-                        request.requirementProfile
-                          .extractionConfidence
+                        request.requirementProfile.extractionConfidence
                           ? `${Math.round(
                               Number(
-                                request.requirementProfile
-                                  .extractionConfidence,
+                                request.requirementProfile.extractionConfidence,
                               ) * 100,
                             )}%`
                           : 'Not available'
@@ -356,16 +336,14 @@ function RequestDetailsPage() {
                       </p>
 
                       <div className="mt-3 flex flex-wrap gap-2">
-                        {request.requirementProfile.goals.map(
-                          (goal) => (
-                            <span
-                              key={goal}
-                              className="rounded-lg border border-[var(--border)] bg-[var(--bg-primary)] px-3 py-2 text-xs text-[var(--text-secondary)]"
-                            >
-                              {goal}
-                            </span>
-                          ),
-                        )}
+                        {request.requirementProfile.goals.map((goal) => (
+                          <span
+                            key={goal}
+                            className="rounded-lg border border-[var(--border)] bg-[var(--bg-primary)] px-3 py-2 text-xs text-[var(--text-secondary)]"
+                          >
+                            {goal}
+                          </span>
+                        ))}
                       </div>
                     </div>
                   )}
@@ -388,15 +366,10 @@ function RequestDetailsPage() {
             {/* Lifecycle */}
             <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] p-6">
               <div className="flex items-center gap-3">
-                <Clock3
-                  size={16}
-                  className="text-[var(--copper)]"
-                />
+                <Clock3 size={16} className="text-[var(--copper)]" />
 
                 <div>
-                  <p className="text-sm font-semibold">
-                    Request lifecycle
-                  </p>
+                  <p className="text-sm font-semibold">Request lifecycle</p>
 
                   <p className="mt-1 text-xs text-[var(--text-muted)]">
                     Your request moves through SOLVRA's procurement workflow.
@@ -405,36 +378,32 @@ function RequestDetailsPage() {
               </div>
 
               <div className="mt-6 grid gap-2 sm:grid-cols-5">
-                {[
-                  'DRAFT',
-                  'OPEN',
-                  'EVALUATING',
-                  'NEGOTIATING',
-                  'AWARDED',
-                ].map((status) => {
-                  const active = status === request.status
+                {['DRAFT', 'OPEN', 'EVALUATING', 'NEGOTIATING', 'AWARDED'].map(
+                  (status) => {
+                    const active = status === request.status
 
-                  return (
-                    <div
-                      key={status}
-                      className={`rounded-xl border px-3 py-3 text-center ${
-                        active
-                          ? 'border-[var(--copper)]/30 bg-[var(--copper)]/10'
-                          : 'border-[var(--border)]'
-                      }`}
-                    >
-                      <p
-                        className={`text-[9px] font-bold uppercase tracking-[0.1em] ${
+                    return (
+                      <div
+                        key={status}
+                        className={`rounded-xl border px-3 py-3 text-center ${
                           active
-                            ? 'text-[var(--copper)]'
-                            : 'text-[var(--text-muted)]'
+                            ? 'border-[var(--copper)]/30 bg-[var(--copper)]/10'
+                            : 'border-[var(--border)]'
                         }`}
                       >
-                        {formatStatus(status)}
-                      </p>
-                    </div>
-                  )
-                })}
+                        <p
+                          className={`text-[9px] font-bold uppercase tracking-[0.1em] ${
+                            active
+                              ? 'text-[var(--copper)]'
+                              : 'text-[var(--text-muted)]'
+                          }`}
+                        >
+                          {formatStatus(status)}
+                        </p>
+                      </div>
+                    )
+                  },
+                )}
               </div>
             </section>
           </>
@@ -472,13 +441,7 @@ function SectionHeading({
   )
 }
 
-function InfoCard({
-  label,
-  value,
-}: {
-  label: string
-  value: string
-}) {
+function InfoCard({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] p-4">
       <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-[var(--text-muted)]">

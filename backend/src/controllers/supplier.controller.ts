@@ -15,39 +15,63 @@ const bidIdParamSchema = z.object({
 
 const createBidSchema = z.object({
   title: z.string().trim().min(2).max(200),
-  panelCapacityKw: z.coerce.number().positive('Panel capacity must be greater than zero'),
+  panelCapacityKw: z.coerce
+    .number()
+    .positive('Panel capacity must be greater than zero'),
   batteryCapacityKwh: z.coerce.number().nonnegative().optional().nullable(),
   batteryType: z.string().trim().max(200).optional().nullable(),
   inverterSpec: z.string().trim().max(200).optional().nullable(),
   equipmentDetails: z.any().optional().nullable(),
-  installationCost: z.coerce.number().nonnegative('Installation cost must be zero or greater'),
-  deliveryCost: z.coerce.number().nonnegative('Delivery cost must be zero or greater'),
-  commissioningCost: z.coerce.number().nonnegative('Commissioning cost must be zero or greater'),
+  installationCost: z.coerce
+    .number()
+    .nonnegative('Installation cost must be zero or greater'),
+  deliveryCost: z.coerce
+    .number()
+    .nonnegative('Delivery cost must be zero or greater'),
+  commissioningCost: z.coerce
+    .number()
+    .nonnegative('Commissioning cost must be zero or greater'),
   maintenanceCost: z.coerce.number().nonnegative().optional().nullable(),
   warrantyYears: z.coerce.number().int().min(0).optional().nullable(),
   deliveryTimeDays: z.coerce.number().int().min(0).optional().nullable(),
   paymentTerms: z.string().trim().max(500).optional().nullable(),
-  totalPrice: z.coerce.number().nonnegative('Total price must be zero or greater'),
-  extractionSource: z.enum(['MANUAL_ENTRY', 'AI_EXTRACTED']).default('MANUAL_ENTRY'),
+  totalPrice: z.coerce
+    .number()
+    .nonnegative('Total price must be zero or greater'),
+  extractionSource: z
+    .enum(['MANUAL_ENTRY', 'AI_EXTRACTED'])
+    .default('MANUAL_ENTRY'),
   extractionConfirmed: z.boolean().default(true),
   changeSummary: z.string().trim().max(1000).optional().nullable(),
 })
 
 const createBidVersionSchema = z.object({
-  panelCapacityKw: z.coerce.number().positive('Panel capacity must be greater than zero'),
+  panelCapacityKw: z.coerce
+    .number()
+    .positive('Panel capacity must be greater than zero'),
   batteryCapacityKwh: z.coerce.number().nonnegative().optional().nullable(),
   batteryType: z.string().trim().max(200).optional().nullable(),
   inverterSpec: z.string().trim().max(200).optional().nullable(),
   equipmentDetails: z.any().optional().nullable(),
-  installationCost: z.coerce.number().nonnegative('Installation cost must be zero or greater'),
-  deliveryCost: z.coerce.number().nonnegative('Delivery cost must be zero or greater'),
-  commissioningCost: z.coerce.number().nonnegative('Commissioning cost must be zero or greater'),
+  installationCost: z.coerce
+    .number()
+    .nonnegative('Installation cost must be zero or greater'),
+  deliveryCost: z.coerce
+    .number()
+    .nonnegative('Delivery cost must be zero or greater'),
+  commissioningCost: z.coerce
+    .number()
+    .nonnegative('Commissioning cost must be zero or greater'),
   maintenanceCost: z.coerce.number().nonnegative().optional().nullable(),
   warrantyYears: z.coerce.number().int().min(0).optional().nullable(),
   deliveryTimeDays: z.coerce.number().int().min(0).optional().nullable(),
   paymentTerms: z.string().trim().max(500).optional().nullable(),
-  totalPrice: z.coerce.number().nonnegative('Total price must be zero or greater'),
-  extractionSource: z.enum(['MANUAL_ENTRY', 'AI_EXTRACTED']).default('MANUAL_ENTRY'),
+  totalPrice: z.coerce
+    .number()
+    .nonnegative('Total price must be zero or greater'),
+  extractionSource: z
+    .enum(['MANUAL_ENTRY', 'AI_EXTRACTED'])
+    .default('MANUAL_ENTRY'),
   extractionConfirmed: z.boolean().default(true),
   changeSummary: z.string().trim().max(1000).optional().nullable(),
 })
@@ -122,12 +146,14 @@ export async function updateSupplierProfile(
       })
     }
 
-    const validation = z.object({
-      companyName: z.string().trim().min(2).max(200).optional(),
-      serviceAreas: z.array(z.string().trim().min(1).max(100)).optional(),
-      capabilities: z.array(z.string().trim().min(1).max(100)).optional(),
-      certifications: z.string().trim().max(1000).nullable().optional(),
-    }).safeParse(req.body)
+    const validation = z
+      .object({
+        companyName: z.string().trim().min(2).max(200).optional(),
+        serviceAreas: z.array(z.string().trim().min(1).max(100)).optional(),
+        capabilities: z.array(z.string().trim().min(1).max(100)).optional(),
+        certifications: z.string().trim().max(1000).nullable().optional(),
+      })
+      .safeParse(req.body)
 
     if (!validation.success) {
       return res.status(400).json({
@@ -353,6 +379,9 @@ export async function getOpenRequestById(
       include: {
         requirementProfile: true,
         bids: {
+          where: {
+            supplierId: supplierProfile.id,
+          },
           select: {
             id: true,
             status: true,
@@ -564,9 +593,7 @@ export async function createSupplierBidVersion(
     }
 
     const paramResult = bidIdParamSchema.safeParse({
-      bidId: Array.isArray(req.params.id)
-        ? req.params.id[0]
-        : req.params.id,
+      bidId: Array.isArray(req.params.id) ? req.params.id[0] : req.params.id,
     })
 
     if (!paramResult.success) {
@@ -635,10 +662,7 @@ export async function createSupplierBidVersion(
       })
     }
 
-    if (
-      bid.request.status === 'AWARDED' ||
-      bid.request.status === 'CLOSED'
-    ) {
+    if (bid.request.status === 'AWARDED' || bid.request.status === 'CLOSED') {
       return res.status(409).json({
         success: false,
         message: 'This request is no longer accepting bid revisions',
@@ -732,10 +756,7 @@ export async function createSupplierBidVersion(
   }
 }
 
-export async function getMyBids(
-  req: AuthenticatedRequest,
-  res: Response,
-) {
+export async function getMyBids(req: AuthenticatedRequest, res: Response) {
   try {
     const userId = req.user?.userId
 
@@ -794,10 +815,7 @@ export async function getMyBids(
   }
 }
 
-export async function getMyBidById(
-  req: AuthenticatedRequest,
-  res: Response,
-) {
+export async function getMyBidById(req: AuthenticatedRequest, res: Response) {
   try {
     const userId = req.user?.userId
 
@@ -818,9 +836,7 @@ export async function getMyBidById(
     }
 
     const paramResult = bidIdParamSchema.safeParse({
-      bidId: Array.isArray(req.params.id)
-        ? req.params.id[0]
-        : req.params.id,
+      bidId: Array.isArray(req.params.id) ? req.params.id[0] : req.params.id,
     })
 
     if (!paramResult.success) {

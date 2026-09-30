@@ -103,6 +103,11 @@ export async function createNegotiation(
         id: true,
         requestId: true,
         status: true,
+        request: {
+          select: {
+            status: true,
+          },
+        },
       },
     })
 
@@ -138,28 +143,48 @@ export async function createNegotiation(
         negotiation: existingNegotiation,
       })
     }
+    if (
+      bid.request.status !== 'EVALUATING' &&
+      bid.request.status !== 'NEGOTIATING'
+    ) {
+      return res.status(409).json({
+        success: false,
+        message: 'Negotiation can only start after evaluation',
+      })
+    }
 
     const [negotiation] = await prisma.$transaction([
-  prisma.negotiation.create({
-    data: {
-      bidId: bid.id,
-      status: 'OPEN',
-    },
-    select: {
-      id: true,
-      bidId: true,
-      status: true,
-      createdAt: true,
-    },
-  }),
+      prisma.negotiation.create({
+        data: {
+          bidId: bid.id,
+          status: 'OPEN',
+        },
+        select: {
+          id: true,
+          bidId: true,
+          status: true,
+          createdAt: true,
+        },
+      }),
 
-  prisma.bid.update({
-    where: { id: bid.id },
-    data: {
-      status: 'UNDER_NEGOTIATION',
-    },
-  }),
-])
+      prisma.bid.update({
+        where: {
+          id: bid.id,
+        },
+        data: {
+          status: 'UNDER_NEGOTIATION',
+        },
+      }),
+
+      prisma.solarRequest.update({
+        where: {
+          id: bid.requestId,
+        },
+        data: {
+          status: 'NEGOTIATING',
+        },
+      }),
+    ])
 
     return res.status(201).json({
       success: true,
@@ -186,10 +211,7 @@ export async function createNegotiation(
  * SUPPLIER:
  *   Can access negotiations for their own bids.
  */
-async function getNegotiationAccessWhere(
-  userId: string,
-  role: string,
-) {
+async function getNegotiationAccessWhere(userId: string, role: string) {
   if (role === 'BUYER') {
     const buyerProfile = await prisma.buyerProfile.findUnique({
       where: { userId },
@@ -383,9 +405,7 @@ export async function getNegotiationById(
     const role = req.user?.role
 
     const result = negotiationIdParamSchema.safeParse({
-      id: Array.isArray(req.params.id)
-        ? req.params.id[0]
-        : req.params.id,
+      id: Array.isArray(req.params.id) ? req.params.id[0] : req.params.id,
     })
 
     if (!result.success) {
@@ -549,9 +569,7 @@ export async function createNegotiationMessage(
     const role = req.user?.role
 
     const result = negotiationIdParamSchema.safeParse({
-      id: Array.isArray(req.params.id)
-        ? req.params.id[0]
-        : req.params.id,
+      id: Array.isArray(req.params.id) ? req.params.id[0] : req.params.id,
     })
 
     if (!result.success) {
